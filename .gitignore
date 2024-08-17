@@ -1,0 +1,54 @@
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Python wheels
+*.whl
+*.egg*
+*.pyc
+
+# Executables
+*.exe
+*.out
+*.app
+*.stl
+*.JSON
+test.py
+
+# Visualization files
+*.vtk
+*.vtm
+*.vti
+
+# Exclude directories
+build/
+external/*/
+.cache/
+.vscode
+images/*
+examples/*
+tmp/
