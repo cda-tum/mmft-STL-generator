@@ -24,10 +24,6 @@ struct Trapezoid : public Primitive{
 
     Trapezoid(int id, std::vector<std::shared_ptr<Vertex>> vertices);
 
-    Trapezoid(int id, std::vector<Face> faces);
-
-    std::array<double, 3> getNormal() { return normal; }
-
     void render() override;
 
 };
