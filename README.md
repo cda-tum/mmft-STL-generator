@@ -1,2 +1,2 @@
 # mmft-STL-generator
-An automatic STL format geometry generator for microfluidic networks
+A lightweight automatic STL format geometry generator for microfluidic networks
