@@ -58,13 +58,13 @@ struct Coordinate {
 
 struct Vertex {
 
-    const int id;
+    const unsigned int id;
     Coordinate position;
 
-    Vertex(int id, std::array<double,3> position) :
+    Vertex(unsigned int id, std::array<double,3> position) :
         id(id), position(position) { }
 
-    Vertex(int id, double x, double y, double z) :
+    Vertex(unsigned int id, double x, double y, double z) :
         id(id), position(x, y, z) { }
 
 };
@@ -76,11 +76,17 @@ struct Face {
     std::array<double,3> normal;
 
     Face(unsigned int id, std::array<std::shared_ptr<Vertex>,3> vertices) :
-        id(id), vertices(vertices) { }
+        id(id), vertices(vertices) 
+    { 
+        auto Vec1 = vertices[1]->position - vertices[0]->position;
+        auto Vec2 = vertices[2]->position - vertices[0]->position;
+        auto n = Vec1.crossProduct(Vec2);
+
+        normal = n.toArray();
+    }
 
     std::array<unsigned int, 3> getVertexIds() {
-
-        std::array<unsigned int, 3> vertexIds = {vertices[0]->id, 
+        std::array<unsigned int, 3> vertexIds ={vertices[0]->id, 
                                                 vertices[1]->id,
                                                 vertices[2]->id};
         return vertexIds;

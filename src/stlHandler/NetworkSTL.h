@@ -8,10 +8,15 @@
 #include <vector>
 
 #include "BaseSTL.h"
+#include "../architecture/Node.h"
+#include "../architecture/Channel.h"
+#include "../architecture/Network.h"
 
 namespace arch {
 
 class Network;
+
+class Node;
 
 }
 
@@ -36,6 +41,13 @@ protected:
 public:
     NetworkSTL(std::shared_ptr<arch::Network> network);
 
+    void nodeToSTL(int nodeId);
+
+    void nodeToSTL(const arch::Node& node);
+
+    void groundNodeToSTL(const arch::Node& node);
+
+    void channelToSTL(const arch::Channel& channel);
 };
 
 } // namespace arch

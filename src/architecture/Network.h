@@ -28,7 +28,20 @@ private:
     std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Channel>> reach;
 
 public:
+
     Network();
+
+    std::vector<Node>& getNodes();
+
+    Node& getNode(int nodeId);
+
+    std::vector<Channel>& getChannels();
+
+    Channel& getChannel(int channelId);
+
+    std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Channel>>>& getReach();
+
+    std::unordered_map<int, std::shared_ptr<Channel>>& getReach(int nodeId);
 
 };
 

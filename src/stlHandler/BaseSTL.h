@@ -5,7 +5,16 @@
 #pragma once
 
 #include <memory>
+#include <stdexcept>
 #include <vector>
+
+#include "primitives/Core.h"
+#include "primitives/Channel.h"
+#include "primitives/Cuboid.h"
+#include "primitives/Rectangle.h"
+#include "primitives/Trapezoid.h"
+#include "primitives/TrapezoidalChannel.h"
+#include "primitives/TrapezoidalPrism.h"
 
 namespace arch {
 
@@ -30,7 +39,8 @@ class BaseSTL {
 
 protected:
 
-    int id;
+    double resolution = 1e-9;
+
     std::vector<std::shared_ptr<Vertex>>                vertices;
     std::vector<std::shared_ptr<Face>>                  faces;
     std::vector<std::shared_ptr<Primitive>>             primitives;
@@ -39,24 +49,31 @@ public:
 
     BaseSTL();
 
-    int getId() const { return id; };
+    std::tuple<bool, unsigned int> BaseSTL::findDuplicate(Coordinate c);
+
+    std::shared_ptr<Vertex> addVertex(std::array<double,3> position);
 
     std::shared_ptr<Vertex> addVertex(double x, double y, double z);
 
-    std::shared_ptr<Face> addFace();
+    std::shared_ptr<Face> addFace(unsigned int v1, unsigned int v2, unsigned int v3);
 
-    std::shared_ptr<Rectangle> addRectangle();
+    Face& addFace(Face& addFace);
 
-    std::shared_ptr<Trapezoid> addTrapezoid();
+    std::shared_ptr<Rectangle> addRectangle(std::array<Coordinate,4> c);
 
-    std::shared_ptr<Cuboid> addCuboid();
+    std::shared_ptr<Trapezoid> addTrapezoid(std::array<Coordinate,4> c);
+
+    std::shared_ptr<Cuboid> addCuboid(std::array<Coordinate,8> c);
     
-    std::shared_ptr<Channel> addChannel();
+    std::shared_ptr<Channel> addChannel(std::array<Coordinate,8> c, unsigned int hollowDir=1);
 
-    std::shared_ptr<TrapezoidalPrism> addTrapezoidalPrism();
+    std::shared_ptr<TrapezoidalPrism> addTrapezoidalPrism(std::array<Coordinate,8> c);
 
-    std::shared_ptr<TrapezoidalChannel> addTrapezoidalChannel();
+    std::shared_ptr<TrapezoidalChannel> addTrapezoidalChannel(std::array<Coordinate,8> c, unsigned int hollowDir=1);
 
+    /**
+     * @brief Loop through all primitives and add the composing faces to the faces vector.
+     */
     void render();
 
     void translate(double x, double y, double z);
