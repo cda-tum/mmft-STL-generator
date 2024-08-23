@@ -40,8 +40,8 @@ void TrapezoidalPrism::render()
                                                     std::array<int,3>{4, 6, 7}};
     // Define and add faces
     for (auto p : vertexIds) {
-        std::array<std::shared_ptr<Vertex>,3> vertices = {vertices[p[0]], vertices[p[1]], vertices[p[2]]};
-        Face face(faces.size(), vertices);
+        std::array<std::shared_ptr<Vertex>,3> v = {vertices[p[0]], vertices[p[1]], vertices[p[2]]};
+        Face face(faces.size(), v);
         this->faces.push_back(face);
     } 
 }

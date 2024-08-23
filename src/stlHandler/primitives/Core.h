@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <cmath>
 #include <memory>
 #include <stdexcept>
 #include <vector>
@@ -45,6 +46,23 @@ struct Coordinate {
         return Coordinate(  (this->y - t.y) * (this->z - t.z) - (this->z - t.z) * (this->y - t.y),
                             (this->z - t.z) * (this->x - t.x) - (this->x - t.x) * (this->z - t.z),
                             (this->x - t.x) * (this->y - t.y) - (this->y - t.y) * (this->x - t.x));
+    }
+
+    double dotProduct(const Coordinate& t) const {
+        return ((this->x * t.x) + (this->y * t.y) + (this->z * t.z));
+    }
+
+    Coordinate rotate(const Coordinate& center, std::array<double,3> axis, double rad) const {
+        double cost = std::cos(rad);
+        double cost1 = 1.0-std::cos(rad);
+        double sint = std::sin(rad);
+        double length = Coordinate(axis).length();
+        Coordinate u = Coordinate(axis[0]/length, axis[1]/length, axis[2]/length);
+        Coordinate v = this->operator-(center);
+        double x_ = v.x*(u.x*u.x*cost1 + cost) + v.y*(u.x*u.y*cost1 - u.z*sint) + v.z*(u.x*u.z*cost1 + u.y*sint);
+        double y_ = v.x*(u.x*u.y*cost1 + u.z*sint) + v.y*(u.y*u.y*cost1 + cost) + v.z*(u.y*u.z*cost1 - u.x*sint);
+        double z_ = v.x*(u.x*u.z*cost1 - u.y*sint) + v.y*(u.y*u.z*cost1 + u.x*sint) + v.z*(u.z*u.z*cost1 + cost);
+        return Coordinate(x_, y_, z_);
     }
 
     std::array<double,3> toArray() {
@@ -90,6 +108,15 @@ struct Face {
                                                 vertices[1]->id,
                                                 vertices[2]->id};
         return vertexIds;
+    }
+
+    /**
+     * @brief returns the angle at vertex[0]
+     */
+    double getAngle() {
+        auto Vec1 = vertices[1]->position - vertices[0]->position;
+        auto Vec2 = vertices[2]->position - vertices[0]->position;
+        return std::acos(Vec1.dotProduct(Vec2)/(Vec1.length()*Vec2.length()));
     }
 
 };

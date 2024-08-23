@@ -10,7 +10,9 @@
 
 #include "primitives/Core.h"
 #include "primitives/Channel.h"
+#include "primitives/Circle.h"
 #include "primitives/Cuboid.h"
+#include "primitives/Pizza.h"
 #include "primitives/Rectangle.h"
 #include "primitives/Trapezoid.h"
 #include "primitives/TrapezoidalChannel.h"
@@ -30,6 +32,8 @@ struct Face;
 class Primitive;
 class Rectangle;
 class Trapezoid;
+class Pizza;
+class Circle;
 class Cuboid;
 class Channel;
 class TrapezoidalPrism;
@@ -62,6 +66,14 @@ public:
     std::shared_ptr<Rectangle> addRectangle(std::array<Coordinate,4> c);
 
     std::shared_ptr<Trapezoid> addTrapezoid(std::array<Coordinate,4> c);
+
+    std::shared_ptr<Pizza> addPizza(std::array<Coordinate,3> c, std::array<double,3> normal, int radResolution);
+
+    std::shared_ptr<Pizza> addPizza(const std::shared_ptr<Pizza>& mirror, double distance);
+
+    std::shared_ptr<Circle> addCircle(Coordinate c, std::array<double,3> normal, double radius, int radResolution);
+
+    std::shared_ptr<Circle> addCircle(const std::shared_ptr<Circle> mirror, double d);
 
     std::shared_ptr<Cuboid> addCuboid(std::array<Coordinate,8> c);
     

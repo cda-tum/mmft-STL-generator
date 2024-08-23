@@ -59,24 +59,24 @@ void Channel::render()
     if (hollowDir != 1) {
         // Define and add faces of the front and the back
         for (auto p : frontBack) {
-            std::array<std::shared_ptr<Vertex>,3> vertices = {vertices[p[0]], vertices[p[1]], vertices[p[2]]};
-            Face face(faces.size(), vertices);
+            std::array<std::shared_ptr<Vertex>,3> v = {vertices[p[0]], vertices[p[1]], vertices[p[2]]};
+            Face face(faces.size(), v);
             this->faces.push_back(face);
         } 
     } 
     if (hollowDir != 0) {
         // Define and add faces of the left and the right
         for (auto p : leftRight) {
-            std::array<std::shared_ptr<Vertex>,3> vertices = {vertices[p[0]], vertices[p[1]], vertices[p[2]]};
-            Face face(faces.size(), vertices);
+            std::array<std::shared_ptr<Vertex>,3> v = {vertices[p[0]], vertices[p[1]], vertices[p[2]]};
+            Face face(faces.size(), v);
             this->faces.push_back(face);
         } 
     }                                       
     if (hollowDir != 2) {
         // Define and add faces of the top and the bottom
         for (auto p : topBottom) {
-            std::array<std::shared_ptr<Vertex>,3> vertices = {vertices[p[0]], vertices[p[1]], vertices[p[2]]};
-            Face face(faces.size(), vertices);
+            std::array<std::shared_ptr<Vertex>,3> v = {vertices[p[0]], vertices[p[1]], vertices[p[2]]};
+            Face face(faces.size(), v);
             this->faces.push_back(face);
         } 
     }

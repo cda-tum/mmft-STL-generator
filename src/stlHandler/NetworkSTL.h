@@ -50,4 +50,33 @@ public:
     void channelToSTL(const arch::Channel& channel);
 };
 
+class NodeSTL {
+
+private:
+
+    const int id;
+    const arch::Node networkNode;
+    const std::unordered_map<int, std::shared_ptr<arch::Channel>> reach;
+    double height;
+    double radius;
+    std::vector<std::shared_ptr<Vertex>> crownVertices; // These vertices form the top ring of the STL node.
+    std::vector<Vertex> bodyVertices;
+    std::vector<Face> nodeFaces;
+
+public:
+
+    NodeSTL(const arch::Node& networkNode, const std::unordered_map<int, std::shared_ptr<arch::Channel>>& reach);
+
+    void extractCrown();
+
+    void extrapolateVertices();
+
+    void render();
+
+    std::vector<Face> getFaces() { return nodeFaces; }
+
+    std::vector<Vertex> getVertices() { return bodyVertices; }
+
+};
+
 } // namespace arch

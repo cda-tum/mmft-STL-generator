@@ -101,6 +101,106 @@ std::shared_ptr<Trapezoid> BaseSTL::addTrapezoid(std::array<Coordinate,4> c)
     return newTrapezoid;
 }
 
+std::shared_ptr<Pizza> BaseSTL::addPizza(std::array<Coordinate,3> c, std::array<double,3> normal, int radResolution)
+{
+    std::vector<std::shared_ptr<Vertex>> v;
+    for (auto n : {0,1,2}) {
+        unsigned int id;
+        auto result = findDuplicate(c[n]);
+        if (std::get<0>(result)) {
+            id = std::get<1>(result);
+            v.push_back(vertices[id]);
+        } else {
+            id = vertices.size();
+            vertices.push_back(std::make_shared<Vertex>(id, c[n]));
+            v.push_back(vertices[id]);
+        }
+    }
+
+    // Add the remaining vertices on the cornicione
+    int i = 0;
+    while (i < radResolution-1) {
+        v.push_back(std::make_shared<Vertex>(vertices.size()));
+        ++i;
+    }
+    
+    std::shared_ptr<Pizza> newPizza = std::make_shared<Pizza>(primitives.size(), v);
+    std::shared_ptr<Primitive> newPrimitive = newPizza;
+    primitives.push_back(newPrimitive);
+    return newPizza;
+}
+
+std::shared_ptr<Pizza> BaseSTL::addPizza(const std::shared_ptr<Pizza>& mirror, double d)
+{
+    std::vector<std::shared_ptr<Vertex>> v;   
+
+    // Add all necessary vertices
+    int i = 0;
+    while (i < mirror->getResolution()+1) {
+        v.push_back(std::make_shared<Vertex>(vertices.size()));
+        ++i;
+    }
+    
+    std::shared_ptr<Pizza> newPizza = std::make_shared<Pizza>(primitives.size(), v, mirror, d);
+    std::shared_ptr<Primitive> newPrimitive = newPizza;
+    primitives.push_back(newPrimitive);
+    return newPizza;
+}
+
+std::shared_ptr<Circle> BaseSTL::addCircle(Coordinate c, std::array<double,3> normal, double radius, int radResolution)
+{
+    // Normalize normal vector 
+    double l = Coordinate(normal).length();
+    Coordinate n(normal[0]/l, normal[1]/l, normal[2]/l);
+
+    // Find a vector with length = radius that is orthogonal to n
+    double r2 = radius*radius;
+    double nznx2 = (n.z*n.z)/(n.x*n.x);
+    double nynx2 = (n.y*n.y)/(n.x*n.x);
+    double nynznx2 = (2*n.y*n.z)/(n.x*n.x);
+
+    double uy = sqrt(r2 * (1 + nznx2)) / (2 * (1 + nynx2 + nznx2));
+    double uz = (sqrt((r2/2) * (1 + nznx2)) - uy * nynznx2) / (2 + 2*nznx2);
+    double ux = sqrt(r2 -uy*uy - uz*uz);
+
+    Coordinate u(ux, uy, uz);
+
+    std::vector<std::shared_ptr<Vertex>> v;
+    for (Coordinate p : {c, c+u}) {
+        unsigned int id;
+        auto result = findDuplicate(p);
+        if (std::get<0>(result)) {
+            id = std::get<1>(result);
+            v.push_back(vertices[id]);
+        } else {
+            id = vertices.size();
+            vertices.push_back(std::make_shared<Vertex>(id, p));
+            v.push_back(vertices[id]);
+        }
+    }
+
+    // Add the remaining vertices on the cornicione
+    int i = 0;
+    while (i < radResolution-1) {
+        v.push_back(std::make_shared<Vertex>(vertices.size()));
+        ++i;
+    }
+
+    std::shared_ptr<Circle> newCircle = std::make_shared<Circle>(primitives.size(), v);
+    std::shared_ptr<Primitive> newPrimitive = newCircle;
+    primitives.push_back(newPrimitive);
+    return newCircle;
+    
+}
+
+std::shared_ptr<Circle> BaseSTL::addCircle(const std::shared_ptr<Circle> mirror, double d)
+{
+    /** TODO:
+     * 
+     * This function is not a priority.
+     */
+}
+
 std::shared_ptr<Cuboid> BaseSTL::addCuboid(std::array<Coordinate,8> c) 
 {
     std::vector<std::shared_ptr<Vertex>> corners;
