@@ -193,14 +193,6 @@ std::shared_ptr<Circle> BaseSTL::addCircle(Coordinate c, std::array<double,3> no
     
 }
 
-std::shared_ptr<Circle> BaseSTL::addCircle(const std::shared_ptr<Circle> mirror, double d)
-{
-    /** TODO:
-     * 
-     * This function is not a priority.
-     */
-}
-
 std::shared_ptr<Cuboid> BaseSTL::addCuboid(std::array<Coordinate,8> c) 
 {
     std::vector<std::shared_ptr<Vertex>> corners;
@@ -295,60 +287,66 @@ void BaseSTL::render() {
     primitives.clear();
 }
 
-void BaseSTL::translate(double x, double y, double z) {
-    /** TODO:
-     * 
-     * Loop through all vertices and translate their coordinates according to translation coordinates.
-     */
+void BaseSTL::translate(std::array<double,3> translation) {
+    for (auto vertex : vertices) {
+        vertex->position = vertex->position.translate(translation);
+    }
 }
 
-void BaseSTL::scale(double x, double y, double z, double center[3]) {
-    /** TODO:
-     * 
-     * Loop through all vertices and translate their coordinates according to scaling.
-     */
+void BaseSTL::scale(std::array<double,3> expansion, const Coordinate& center) {
+    for (auto vertex : vertices) {
+        vertex->position = vertex->position.scale(center, expansion);
+    }
 }
 
-void BaseSTL::rotate(double x, double y, double z, double center[3]) {
-    /** TODO:
-     * 
-     * Loop through all vertices and translate their coordinates according to rotation.
-     */
+void BaseSTL::rotate(double rad, std::array<double,3> rotationalAxis, const Coordinate& center) {
+    for (auto vertex : vertices) {
+        vertex->position = vertex->position.rotate(center, rotationalAxis, rad);
+    }
 }
 
 void BaseSTL::invertFaces() {
-    /** TODO:
-     * 
-     * Loop through all faces and invert their normal direction and the vertex order.
-     */
+    for (auto face : faces) {
+        face->invert();
+    }
 }
 
 std::array<double,3> BaseSTL::getMin() {
-    /** TODO:
-     * 
-     * Return the minimal x, y, and z coordinates of all vertices
-     */
+    std::array<double,3> min = {DBL_MAX, DBL_MAX, DBL_MAX};
+    for (auto vertex : vertices) {
+        if (vertex->position.x < max[0]) { max[0] = vertex->position.x };
+        if (vertex->position.y < max[1]) { max[1] = vertex->position.y };
+        if (vertex->position.z < max[2]) { max[2] = vertex->position.z };
+    }
+    return min;
 }
 
 std::array<double,3> BaseSTL::getMax() {
-    /** TODO:
-     * 
-     * Return the maximal x, y, and z coordinates of all vertices
-     */
+    std::array<double,3> max = {-DBL_MAX, -DBL_MAX, -DBL_MAX};
+    for (auto vertex : vertices) {
+        if (vertex->position.x > max[0]) { max[0] = vertex->position.x };
+        if (vertex->position.y > max[1]) { max[1] = vertex->position.y };
+        if (vertex->position.z > max[2]) { max[2] = vertex->position.z };
+    }
+    return max;
 }
 
-std::tuple<std::array<double,3>, std::array<double,3>> getBoundingBox() {
-    /** TODO:
-     * 
-     * Return the cartesian dimensions that form the bounding box of the STL object.
-     */
+std::tuple<std::array<double,3>, std::array<double,3>> BaseSTL::getBoundingBox() {
+    return {getMin(), getMax()};
 }
 
-void BaseSTL::writeSTL(std::string file) {
-    /** TODO:
-     * 
-     * Loop through all the faces and generate the STL file
-     */
+void BaseSTL::writeSTL(std::string stlName) {
+    std::ofstream stlFile;
+    std::string fileName  = stlName + ".stl";
+    stlFile.open(fileName);
+
+    stlFile << "solid " + stlName + "\n";
+    for (auto face : faces) {
+        stlFile << face->writeFace();
+    }
+    stlFile << "endsolid " + stlName;
+
+    stlFile.close();
 }
 
 }   // namespace stl

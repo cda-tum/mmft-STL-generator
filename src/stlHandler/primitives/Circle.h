@@ -35,8 +35,6 @@ public:
 
     Circle(int id, std::vector<std::shared_ptr<Vertex>> vertices, std::array<double,3> normal, double radius);
 
-    Circle(int id, const Circle& mirror, double distance);
-
     void render() override;
 
 };

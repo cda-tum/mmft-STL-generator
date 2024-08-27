@@ -4,7 +4,9 @@
 
 #pragma once
 
+#include <float.h>
 #include <memory>
+#include <fstream>
 #include <stdexcept>
 #include <vector>
 
@@ -88,11 +90,11 @@ public:
      */
     void render();
 
-    void translate(double x, double y, double z);
+    void translate(std::array<double,3> translation);
 
-    void scale(double x, double y, double z, double center[3]);
+    void scale(std::array<double,3> expansion, const Coordinate& center);
 
-    void rotate(double x, double y, double z, double center[3]);
+    void rotate(double rad, std::array<double,3> rotationalAxis, const Coordinate& center);
 
     void invertFaces();
 

@@ -52,6 +52,20 @@ struct Coordinate {
         return ((this->x * t.x) + (this->y * t.y) + (this->z * t.z));
     }
 
+    Coordinate translate(std::array<double,3> translation) const {
+        double x_ = this->x + translation[0];
+        double y_ = this->y + translation[1];
+        double z_ = this->z + translation[2];
+        return Coordinate(x_, y_, z_);
+    }
+
+    Coordinate scale(const Coordinate& center, std::array<double,3> expansion) const {
+        double x_ = center.x + (this->x - center.x) * expansion[0];
+        double y_ = center.y + (this->y - center.y) * expansion[1];
+        double z_ = center.z + (this->z - center.z) * expansion[2];
+        return Coordinate(x_, y_, z_);
+    }
+
     Coordinate rotate(const Coordinate& center, std::array<double,3> axis, double rad) const {
         double cost = std::cos(rad);
         double cost1 = 1.0-std::cos(rad);
@@ -117,6 +131,35 @@ struct Face {
         auto Vec1 = vertices[1]->position - vertices[0]->position;
         auto Vec2 = vertices[2]->position - vertices[0]->position;
         return std::acos(Vec1.dotProduct(Vec2)/(Vec1.length()*Vec2.length()));
+    }
+
+    void invert() {
+        std::swap(vertices[1], vertices[2]);
+        normal[0] = -normal[0];
+        normal[1] = -normal[1];
+        normal[2] = -normal[2];
+    }
+
+    std::string writeFace() {
+        std::string faceString;
+
+        faceString =    "facet normal " + std::to_string(normal[0]) + " " 
+                        + std::to_string(normal[1]) + " " 
+                        + std::to_string(normal[2]) + "\n"
+                        + "\touter loop\n"
+                        + "\t\tvertex " + std::to_string(vertices[0]->position.x) + " "
+                        + std::to_string(vertices[0]->position.y) + " "
+                        + std::to_string(vertices[0]->position.z) + "\n"
+                        + "\t\tvertex " + std::to_string(vertices[1]->position.x) + " "
+                        + std::to_string(vertices[1]->position.y) + " "
+                        + std::to_string(vertices[1]->position.z) + "\n"
+                        + "\t\tvertex " + std::to_string(vertices[2]->position.x) + " "
+                        + std::to_string(vertices[2]->position.y) + " "
+                        + std::to_string(vertices[2]->position.z) + "\n"
+                        + "\tendloop\n"
+                        + "endfacet\n";
+
+        return faceString;
     }
 
 };

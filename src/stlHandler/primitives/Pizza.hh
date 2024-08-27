@@ -23,12 +23,27 @@ Pizza::Pizza(int id_, std::vector<std::shared_ptr<Vertex>> v_) :
 }
 
 Pizza::Pizza(int id_, std::vector<std::shared_ptr<Vertex>> v_, const Pizza& mirror_, double distance_) :
-    Primitive(id_, v_)
+    Primitive(id_, v_), center(v_[0]), p1(v_[1]), p2(v_[2]), radResolution(mirror_.radResolution), radius(mirror_.radius)
 {
-    /** TODO:
-     * 
-     * Define the vertex coordinates for a mirrored pizza object.
-     */
+    normal = {-mirror_.normal[0], -mirror_.normal[1], -mirror_.normal[2]};
+
+    v_[0]->position = Coordinate(mirror_.center->position.x + distance_*normal[0],
+                                mirror_.center->position.y + distance_*normal[1],
+                                mirror_.center->position.z + distance_*normal[2]);
+
+    v_[1]->position = Coordinate(mirror_.p2->position.x + distance_*normal[0],
+                                mirror_.p2->position.y + distance_*normal[1],
+                                mirror_.p2->position.z + distance_*normal[2]);
+
+    v_[2]->position = Coordinate(mirror_.p1->position.x + distance_*normal[0],
+                                mirror_.p1->position.y + distance_*normal[1],
+                                mirror_.p1->position.z + distance_*normal[2]);
+
+    int i = 1;
+    for (auto vertice = vertices.begin()+3; vertice!=vertices.end(); ++vertice) {
+        (*vertice)->position = p1->position.rotate(center->position, normal, i*radResolution);
+        i++;
+    }
 }
 
 void Pizza::render() 
