@@ -82,11 +82,31 @@ NodeSTL::NodeSTL(const arch::Node& networkNode_, const std::unordered_map<int, s
 
 void NodeSTL::extractCrown()
 {
-    /** TODO:
-     * Based on the node position and channel height, set the height for crown vertices.
-     * Define the crown vertex positions for top-down node-channel interface, also store in bodyVertices
-     *  -> Here we check if neighboring channel "intersection" points are > nodeRadius or not.
-     */
+
+    for (auto channel = channelOrder.begin(); channel != channelOrder.end(); ++channel) {
+
+        auto nextChannel = channelOrder.begin();
+        if (channel != channelOrder.end()) {
+            auto nextChannel = channel + 1;
+        }
+        
+        double pointX = 0.5*channel->channelPtr->getWidth()*std::sin(channel->radialAngle) +
+                        0.5*nextChannel->channelPtr->getWidth()*std::sin(nextChannel->radialAngle);
+        double pointY = - 0.5*channel->channelPtr->getWidth()*std::cos(channel->radialAngle) -
+                        0.5*nextChannel->channelPtr->getWidth()*std::cos(nextChannel->radialAngle);
+
+        if ( sqrt(pointX*pointX + pointY*pointY) >= radius) {
+            /* We add a single coordinate to the sequence*/
+            crownVertices.push_back(Coordinate(pointX, pointY, 0.5*height) + Coordinate(networkNode.getPosition()));
+            /* The single coordinate is referenced to the current and next channel as:
+                points 4 and 5 if we are currently at node A
+                points 6 and 7 if we are currently at node B*/
+        } else {
+            /* We add the cornicione set of coordinates to the sequence */
+            /* The start of the cornicione is point 4 (nodeA) or point 6 (nodeB) of the current channel
+                The end of the cornicione is point 5 (nodeA) or point 7 (nodeB) of the next channel*/
+        }
+    }
 }
 
 void NodeSTL::extrapolateVertices() 

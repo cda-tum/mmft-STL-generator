@@ -66,7 +66,7 @@ private:
     std::vector<arch::RadialPosition> channelOrder;
     double height;
     double radius;
-    std::vector<std::shared_ptr<Vertex>> crownVertices; // These vertices form the top ring of the STL node.
+    std::vector<Coordinate> crownVertices; // These vertices form the top ring of the STL node.
     std::vector<Vertex> bodyVertices;
     std::vector<Face> nodeFaces;
 
