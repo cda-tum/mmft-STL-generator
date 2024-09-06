@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include <algorithm>
 #include <memory>
 #include <vector>
 
@@ -17,6 +18,12 @@ namespace arch {
 class Network;
 
 class Node;
+
+struct RadialPosition {
+    int channelId;
+    double radialAngle;
+    std::shared_ptr<Channel> channelPtr;
+};
 
 }
 
@@ -56,7 +63,7 @@ private:
 
     const int id;
     const arch::Node networkNode;
-    const std::unordered_map<int, std::shared_ptr<arch::Channel>> reach;
+    std::vector<arch::RadialPosition> channelOrder;
     double height;
     double radius;
     std::vector<std::shared_ptr<Vertex>> crownVertices; // These vertices form the top ring of the STL node.

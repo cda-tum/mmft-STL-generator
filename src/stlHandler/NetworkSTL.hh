@@ -50,13 +50,34 @@ void NetworkSTL::nodeToSTL(const arch::Node& node)
 }
 
 NodeSTL::NodeSTL(const arch::Node& networkNode_, const std::unordered_map<int, std::shared_ptr<arch::Channel>>& reach_) :
-    id(networkNode_.getId()), networkNode(networkNode), reach(reach_) 
-{
-    /** TODO:
-     * Loop through reach and define the angle at which the channels are positioned -> Topology Analysis.
-     *  -> nodeRadius == largest channel width (for now)
-     *  -> nodeHeight == largest channel height (for now)
-     */
+    id(networkNode_.getId()), networkNode(networkNode)
+{   
+    // Loop through reach and set this node's height and radius.
+    height = 0.0;
+    radius = 0.0;
+    for (auto& [key, channel] : reach_) {
+        if (channel->getHeight() > height) { height = channel->getHeight(); }
+        if (channel->getWidth() > 2*radius) { radius = 0.5*channel->getWidth(); }
+    }
+
+    // Loop through reach and set the radial angles at which the channels are connected to this node.
+    for (auto& [key, channel] : reach_) {
+        std::shared_ptr<arch::Node> nodeA = channel->getNodeA();
+        std::shared_ptr<arch::Node> nodeB = channel->getNodeB();
+        double dx = ( id == nodeA->getId() ) ? nodeB->getPosition()[0]-nodeA->getPosition()[0] : nodeA->getPosition()[0]-nodeB->getPosition()[0];
+        double dy = ( id == nodeA->getId() ) ? nodeB->getPosition()[1]-nodeA->getPosition()[1] : nodeA->getPosition()[1]-nodeB->getPosition()[1];
+        if (std::abs(nodeA->getPosition()[2] - nodeB->getPosition()[2]) > 1e-9) {
+            throw std::domain_error("Tried to define planar network with nodes out of plane.");
+        }
+        double angle = std::fmod(atan2(dy,dx)+2*M_PI,2*M_PI);
+        arch::RadialPosition newPosition ({key, angle, channel});
+        channelOrder.push_back(newPosition);
+    }
+
+    // Loop through channelOrder and sort by radial position 0 -> 2*pi
+    std::sort(channelOrder.begin(), channelOrder.end(), [](auto a&, auto& b) {
+        return a.radialAngle < b.radialAngle;   // ascending order
+    });
 }
 
 void NodeSTL::extractCrown()

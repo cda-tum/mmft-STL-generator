@@ -5,6 +5,7 @@
 #pragma once
 
 #include <memory>
+#include <stdexcept>
 
 namespace arch
 {
@@ -44,6 +45,14 @@ public:
     void setNodeB(const std::shared_ptr<Node>& node);
 
     std::shared_ptr<Node> getNodeB() const;
+
+    virtual double getHeight() const {
+        throw std::runtime_error("Tried to obtain channel height from non-Rectangular channel");
+    };
+
+    virtual double getWidth() const {
+        throw std::runtime_error("Tried to obtain channel width from non-Rectangular channel");
+    };
 };
 
 
@@ -57,11 +66,11 @@ public:
 
     void setHeight(double height);
 
-    double getHeight() const;
+    double getHeight() const override { return height; }
 
     void setWidth(double width);
 
-    double getWidth() const;
+    double getWidth() const override { return width; }
 };
 
 } // namespace arch
