@@ -45,6 +45,8 @@ public:
     double getResolution() { return radResolution; }
 
     std::array<double,3>& getNormal() { return normal; }
+
+    std::vector<Coordinate> getCornicione ();
 };
 
 }   // namespace stl

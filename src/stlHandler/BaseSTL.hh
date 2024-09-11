@@ -101,7 +101,7 @@ std::shared_ptr<Trapezoid> BaseSTL::addTrapezoid(std::array<Coordinate,4> c)
     return newTrapezoid;
 }
 
-std::shared_ptr<Pizza> BaseSTL::addPizza(std::array<Coordinate,3> c, std::array<double,3> normal, int radResolution)
+std::shared_ptr<Pizza> BaseSTL::addPizza(std::array<Coordinate,3> c, int radResolution)
 {
     std::vector<std::shared_ptr<Vertex>> v;
     for (auto n : {0,1,2}) {

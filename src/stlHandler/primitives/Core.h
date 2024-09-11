@@ -1,4 +1,4 @@
-/**
+    /**
  * @file Core.h
  */
 
@@ -19,6 +19,8 @@ struct Coordinate {
     double x;
     double y;
     double z;
+
+    Coordinate() { }
 
     Coordinate(std::array<double,3> position) : 
         x(position[0]), y(position[1]), z(position[2]) { }

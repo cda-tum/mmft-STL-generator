@@ -69,7 +69,7 @@ public:
 
     std::shared_ptr<Trapezoid> addTrapezoid(std::array<Coordinate,4> c);
 
-    std::shared_ptr<Pizza> addPizza(std::array<Coordinate,3> c, std::array<double,3> normal, int radResolution);
+    std::shared_ptr<Pizza> addPizza(std::array<Coordinate,3> c, int radResolution);
 
     std::shared_ptr<Pizza> addPizza(const std::shared_ptr<Pizza>& mirror, double distance);
 

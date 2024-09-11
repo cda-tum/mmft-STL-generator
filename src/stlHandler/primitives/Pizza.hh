@@ -56,4 +56,12 @@ void Pizza::render()
     }
 }
 
+std::vector<Coordinate> Pizza::getCornicione() {
+    std::vector<Coordinate> Cornicione;
+    for (auto vertice = vertices.begin()+1; vertice!=vertices.end(); ++vertice) {
+        Cornicione.push_back(Coordinate((*vertice)->position));
+    }
+    return Cornicione;
+}
+
 }   // namespace stl
