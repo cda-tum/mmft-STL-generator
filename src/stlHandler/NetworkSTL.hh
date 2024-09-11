@@ -6,22 +6,12 @@ namespace stl
 NetworkSTL::NetworkSTL(std::shared_ptr<arch::Network> network) :
     networkPtr(network)
 {
-    /** TODO:
-     * 
-     * Define the process that loops through all nodes and converts them
-     * into STL format. If node is ground node -> groundNodeToSTL(), otherwise nodeToSTL()
-     * Then convert all channels into STL format.
-     */
-
-    
-
     for (auto node : network->getNodes()) {
         // If the node is a ground node, it needs a different treatment.
         if (node.getGround()) {
-            stlNodes.push_back(std::make_shared<NodeSTL>(groundNodeToSTL(node)));
+            stlNodes.try_emplace(node.getId(), std::make_shared<NodeSTL>(groundNodeToSTL(node)));
         } else {
-            std::shared_ptr<NodeSTL> newNode = std::make_shared<NodeSTL>(nodeToSTL(node));
-            stlNodes.push_back(newNode);
+            stlNodes.try_emplace(node.getId(), std::make_shared<NodeSTL>(nodeToSTL(node)));
         }
     }
 
@@ -36,43 +26,88 @@ NodeSTL NetworkSTL::nodeToSTL(const arch::Node& node)
     // A node has a set of channels attached to it (reach)
     std::unordered_map<int, std::shared_ptr<arch::Channel>> reach = networkPtr->getReach(node.getId());
 
-    NodeSTL stlNode(node, reach);
+    NodeSTL stlNode(node, reach, vertices);
 
     // Sections attached to channel are top-down triangle faces. The remaining "free" sections are pizza-pieces
-    stlNode.extractCrown(this->vertices);
+    stlNode.constructCrown();
 
-    /** TODO: Define the pizza primitives and the connecting rectangle primitives from the stlNode's pizza points
-     * The rendering of the remaining triangle-faces connected to the channels, needs to be placed somewhere
-     */
+    // Generate all vertices for this node
+    int i = 0;
+    for (auto& p : stlNode.nodePoints) {
+        stlNode.p2Vertex.try_emplace(i, int(vertices.size()));
+        vertices.push_back(std::make_shared<Vertex>(vertices.size(), p.toArray()));
+        i++;
+    }
+
+    // Generate all primitves for the node's "pizza"-sections
+    for (auto pizzaPoints : stlNode.pizzaPointIds) {
+        // Add the remaining vertices on the cornicione
+        auto topPizza = addPizza(std::array<int,3>({stlNode.topCenterId, pizzaPoints[2], pizzaPoints[3]}), nodeResolution);
+        auto bottomPizza = addPizza(std::array<int,3>({stlNode.bottomCenterId, pizzaPoints[0], pizzaPoints[1]}), nodeResolution);
+        // Add the rectangle primitives for the node side
+        for (int j=0; j < nodeResolution; j++) {
+            int topStart = vertices.size() -2*nodeResolution +3;
+            int bottomStart = vertices.size() -1;
+            addRectangle({bottomStart-j, bottomStart-j-1, topStart+j+1, topStart+j});
+        }
+    }
+
+    // Generate all primitives for the node's "triangles"
+    for (auto trianglePoints : stlNode.trianglePointIds) {
+        addFace(stlNode.topCenterId, trianglePoints[2], trianglePoints[3]);
+        addFace(stlNode.bottomCenterId, trianglePoints[0], trianglePoints[1]);
+    }
 
     return stlNode;
 }
 
 NodeSTL NetworkSTL::groundNodeToSTL(const arch::Node& node)
 {
-    /** TODO:
-     * 
-     */
+    // A ground node has only one channel attached to it (reach)
+    std::unordered_map<int, std::shared_ptr<arch::Channel>> reach = networkPtr->getReach(node.getId());
+    if (reach.size() > 1) {
+        throw std::domain_error("Tried to treat regular node as ground node.");
+    }
+    std::shared_ptr<arch::Channel> channel;
+    for (auto& [key, channel_] : reach) {
+        channel = channel_;
+    }
+
+    NodeSTL stlNode(node, channel);
+
+    // Generate all vertices for this node
+    int i = 0;
+    for (auto& p : stlNode.nodePoints) {
+        stlNode.p2Vertex.try_emplace(i, int(vertices.size()));
+        vertices.push_back(std::make_shared<Vertex>(vertices.size(), p.toArray()));
+        i++;
+    }
+
+    // Generate the rectangular face primitive of the groundNode
+    addRectangle({stlNode.p2Vertex[3], stlNode.p2Vertex[1], stlNode.p2Vertex[0], stlNode.p2Vertex[2]});
+
+    return stlNode;
 }
 
 Channel NetworkSTL::channelToSTL(const arch::Channel& channel)
 {
-    std::vector<std::shared_ptr<Vertex>> channelVertices;
-    std::array<int, 4> vertexIdsA = stlNodes.at(channel.getNodeA()->getId())->getChannelVertices(channel.getId());
-    std::array<int, 4> vertexIdsB = stlNodes.at(channel.getNodeB()->getId())->getChannelVertices(channel.getId());
+    std::array<int, 8> channelVertexIds;
+    std::shared_ptr<NodeSTL> stlNodeA = stlNodes.at(channel.getNodeA()->getId());
+    std::shared_ptr<NodeSTL> stlNodeB = stlNodes.at(channel.getNodeB()->getId());
+    std::array<int, 4> pointIdsA = stlNodes.at(channel.getNodeA()->getId())->channelPoints.at(channel.getId());
+    std::array<int, 4> pointIdsB = stlNodes.at(channel.getNodeB()->getId())->channelPoints.at(channel.getId());
 
-    channelVertices.push_back(vertices.at(vertexIdsA[0]));
-    channelVertices.push_back(vertices.at(vertexIdsA[1]));
-    channelVertices.push_back(vertices.at(vertexIdsB[0]));
-    channelVertices.push_back(vertices.at(vertexIdsB[1]));
-    channelVertices.push_back(vertices.at(vertexIdsA[3]));
-    channelVertices.push_back(vertices.at(vertexIdsA[2]));
-    channelVertices.push_back(vertices.at(vertexIdsB[3]));
-    channelVertices.push_back(vertices.at(vertexIdsB[2]));
+    channelVertexIds[0] = stlNodeA->p2Vertex.at(pointIdsA[0]);
+    channelVertexIds[1] = stlNodeA->p2Vertex.at(pointIdsA[1]);
+    channelVertexIds[2] = stlNodeB->p2Vertex.at(pointIdsB[2]);
+    channelVertexIds[3] = stlNodeB->p2Vertex.at(pointIdsB[3]);
+    channelVertexIds[4] = stlNodeA->p2Vertex.at(pointIdsA[3]);
+    channelVertexIds[5] = stlNodeB->p2Vertex.at(pointIdsB[2]);
+    channelVertexIds[6] = stlNodeB->p2Vertex.at(pointIdsB[3]);
+    channelVertexIds[7] = stlNodeA->p2Vertex.at(pointIdsA[2]);
 
-    std::shared_ptr<Channel> newChannel = std::make_shared<Channel>(primitives.size(), channelVertices, 1);
-    std::shared_ptr<Primitive> newPrimitive = newChannel;
-    primitives.push_back(newPrimitive);
+    auto newChannel = addChannel(channelVertexIds, 1);
+
     return *newChannel;
 }
 
@@ -82,7 +117,7 @@ Channel NetworkSTL::channelToSTL(const arch::Channel& channel)
 
 NodeSTL::NodeSTL(const arch::Node& networkNode_, const std::unordered_map<int, std::shared_ptr<arch::Channel>>& reach_, 
     std::vector<std::shared_ptr<Vertex>>& vertices_) :
-    id(networkNode_.getId()), networkNode(networkNode)
+    id(networkNode_.getId()), networkNode(networkNode_), ground(false)
 {   
     // Loop through reach and set this node's height and radius.
     height = 0.0;
@@ -120,7 +155,47 @@ NodeSTL::NodeSTL(const arch::Node& networkNode_, const std::unordered_map<int, s
     });
 }
 
-void NodeSTL::extractCrown(std::vector<std::shared_ptr<Vertex>>& vertices_)
+NodeSTL::NodeSTL(const arch::Node& networkGroundNode_, std::shared_ptr<arch::Channel> channel_) :
+    id(networkGroundNode_.getId()), networkNode(networkGroundNode_), ground(true)
+{   
+    // Loop through reach and set this node's height and radius.
+    height = channel_->getHeight();
+    radius = channel_->getWidth();
+
+    // Set the radil angle at which the channel is connected to this node
+    std::shared_ptr<arch::Node> nodeA = channel_->getNodeA();
+    std::shared_ptr<arch::Node> nodeB = channel_->getNodeB();
+    double dx = ( id == nodeA->getId() ) ? nodeB->getPosition()[0]-nodeA->getPosition()[0] : nodeA->getPosition()[0]-nodeB->getPosition()[0];
+    double dy = ( id == nodeA->getId() ) ? nodeB->getPosition()[1]-nodeA->getPosition()[1] : nodeA->getPosition()[1]-nodeB->getPosition()[1];
+    if (std::abs(nodeA->getPosition()[2] - nodeB->getPosition()[2]) > 1e-9) {
+        throw std::domain_error("Tried to define planar network with nodes out of plane.");
+    }
+    double angle = std::fmod(atan2(dy,dx)+2*M_PI,2*M_PI);
+    arch::RadialPosition channelPosition ({channel_->getId(), angle, channel_});
+
+    double pointX = 0.5*radius*std::sin(channelPosition.radialAngle);
+    double pointY = -0.5*radius*std::cos(channelPosition.radialAngle);
+
+    Coordinate topRight = Coordinate(pointX, pointY, 0.5*height) + Coordinate(networkNode.getPosition());
+    Coordinate bottomRight = Coordinate(pointX, pointY, 0.5*height) + Coordinate(networkNode.getPosition());
+    Coordinate topLeft = Coordinate(-pointX, -pointY, -0.5*height) + Coordinate(networkNode.getPosition());
+    Coordinate bottomLeft = Coordinate(-pointX, -pointY, -0.5*height) + Coordinate(networkNode.getPosition());
+
+    nodePoints.push_back(topRight);
+    nodePoints.push_back(bottomRight);
+    nodePoints.push_back(topLeft);
+    nodePoints.push_back(bottomLeft);
+
+    if (id == channel_->getNodeA()->getId()) {
+        channelPoints.try_emplace(channel_->getId(), std::array<int, 4>({4, 2, 0, 1}));
+    }
+    else if (id == channel_->getNodeB()->getId()) {
+        channelPoints.try_emplace(channel_->getId(), std::array<int, 4>({4, 2, 0, 1}));
+    }
+
+}
+
+void NodeSTL::constructCrown()
 {
 
     for (auto channel = channelOrder.begin(); channel != channelOrder.end(); ++channel) {
@@ -131,8 +206,8 @@ void NodeSTL::extractCrown(std::vector<std::shared_ptr<Vertex>>& vertices_)
         }
         double angle = std::fmod(nextChannel->radialAngle - channel->radialAngle, 2*M_PI);
 
-        channelVertices.try_emplace(channel->channelId, std::array<int, 4>());
-        channelVertices.try_emplace(nextChannel->channelId, std::array<int, 4>());
+        channelPoints.try_emplace(channel->channelId, std::array<int, 4>());
+        channelPoints.try_emplace(nextChannel->channelId, std::array<int, 4>());
         
         double pointX = 0.5*channel->channelPtr->getWidth()*std::sin(channel->radialAngle) +
                         0.5*nextChannel->channelPtr->getWidth()*std::sin(nextChannel->radialAngle);
@@ -141,31 +216,22 @@ void NodeSTL::extractCrown(std::vector<std::shared_ptr<Vertex>>& vertices_)
 
         if ( sqrt(pointX*pointX + pointY*pointY) >= radius && angle <= M_PI) {
             /* We add a single coordinate to the sequence*/
-            int vertexId = vertices_.size();
+            int pointId = nodePoints.size();
             Coordinate newPointTop = Coordinate(pointX, pointY, 0.5*height) + Coordinate(networkNode.getPosition());
             Coordinate newPointBottom = Coordinate(pointX, pointY, -0.5*height) + Coordinate(networkNode.getPosition());
-            vertices_.push_back(std::make_shared<Vertex>(vertexId, newPointTop));
-            vertices_.push_back(std::make_shared<Vertex>(vertexId+1, newPointBottom));
-            crownVertexIds.push_back(vertexId);
-            bodyVertexIds.push_back(vertexId);
-            bodyVertexIds.push_back(vertexId+1);
+            nodePoints.push_back(newPointTop);
+            nodePoints.push_back(newPointBottom);
+            if (channel != channelOrder.begin()) {
+                trianglePointIds.push_back({pointId-2, pointId, pointId-1, pointId+1});
+            }
             /* The single coordinate is referenced to the current and next channel as:
                 points 0, 4 and 1, 5 if we are currently at node A
                 points 2, 6 and 3, 7 if we are currently at node B */
-            if (id == channel->channelPtr->getNodeA()->getId()) {
-                channelVertices.at(channel->channelId)[0] = vertexId+1;
-                channelVertices.at(channel->channelId)[4] = vertexId;
-            } else if (id == channel->channelPtr->getNodeB()->getId()) {
-                channelVertices.at(channel->channelId)[2] = vertexId+1;
-                channelVertices.at(channel->channelId)[6] = vertexId;
-            }
-            if (id == nextChannel->channelPtr->getNodeA()->getId()) {
-                channelVertices.at(nextChannel->channelId)[1] = vertexId+1;
-                channelVertices.at(nextChannel->channelId)[5] = vertexId;
-            } else if (id == nextChannel->channelPtr->getNodeB()->getId()) {
-                channelVertices.at(nextChannel->channelId)[3] = vertexId+1;
-                channelVertices.at(nextChannel->channelId)[7] = vertexId;
-            }
+            channelPoints.at(channel->channelId)[0] = pointId+1;
+            channelPoints.at(channel->channelId)[3] = pointId;
+            channelPoints.at(nextChannel->channelId)[1] = pointId+1;
+            channelPoints.at(nextChannel->channelId)[2] = pointId;
+
         } else {
             double angle1 = channel->radialAngle + std::atan2(channel->channelPtr->getWidth(), radius);
             Coordinate p1 = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle1), radius*std::sin(angle1), 0.5*height);
@@ -175,40 +241,23 @@ void NodeSTL::extractCrown(std::vector<std::shared_ptr<Vertex>>& vertices_)
             Coordinate p2 = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle2), radius*std::sin(angle2), 0.5*height);
             Coordinate p2_m = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle2), radius*std::sin(angle2), -0.5*height);
 
-            auto topPizza = Pizza({vertices_[topCenterId]->position, p1, p2}, resolution);
+            int pointId = nodePoints.size();
+            nodePoints.push_back(p1);
+            nodePoints.push_back(p1_m);
+            nodePoints.push_back(p2);
+            nodePoints.push_back(p2_m);
+            pizzaPointIds.push_back({pointId, pointId+2, pointId+1, pointId+3});
 
-            /* We add the cornicione set of coordinates to the sequence */
-            /* The start of the cornicione is point 4 (nodeA) or point 6 (nodeB) of the current channel
-                The end of the cornicione is point 5 (nodeA) or point 7 (nodeB) of the next channel */
+            /* The single coordinate is referenced to the current and next channel as:
+                points 0, 4 and 1, 5 if we are currently at node A
+                points 2, 6 and 3, 7 if we are currently at node B */
+            channelPoints.at(channel->channelId)[0] = pointId+1;
+            channelPoints.at(channel->channelId)[3] = pointId;
+            channelPoints.at(nextChannel->channelId)[1] = pointId+3;
+            channelPoints.at(nextChannel->channelId)[2] = pointId+2;
 
-            /**
-             * TODO: Simply store the center, p1 and p2 values for pizzas, top and bottom. Store triangles for channel attachments.
-             * The primitives will be constructed in NetworkSTL::nodeToSTL
-             */
-
-            int v1 = vertices_.size();
-            int v1_m = vertices_.size()+1;
-            vertices_.push_back(std::make_shared<Vertex>(v1, p1));
-            vertices_.push_back(std::make_shared<Vertex>(v1_m, p1_m));
-
-            int v2 = vertices_.size();
-            int v2_m = vertices_.size()+1;
-            vertices_.push_back(std::make_shared<Vertex>(v2, p2));
-            vertices_.push_back(std::make_shared<Vertex>(v2_m, p2_m));
-
-            Pizza(0, std::vector<std::shared_ptr<Vertex>>{center, v1, v2});
-            Pizza.getCornicione(resolution);
         }
     }
-}
-
-void NodeSTL::render()
-{
-    /** TODO:
-     * Close the node by defining the faces based on the entire state.
-     *  -> Node sections (circular section) that is attachd to node is a top-down triangle face.
-     *  -> "Free" Node sections are top down pizza-slices, consisting of circ. resolution no. pizzas.
-     */
 }
 
 } // namespace stl

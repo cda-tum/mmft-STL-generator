@@ -65,9 +65,13 @@ public:
 
     Face& addFace(Face& addFace);
 
+    std::shared_ptr<Rectangle> addRectangle(std::array<int,4> c);
+
     std::shared_ptr<Rectangle> addRectangle(std::array<Coordinate,4> c);
 
     std::shared_ptr<Trapezoid> addTrapezoid(std::array<Coordinate,4> c);
+
+    std::shared_ptr<Pizza> addPizza(std::array<int,3> c, int radResolution);
 
     std::shared_ptr<Pizza> addPizza(std::array<Coordinate,3> c, int radResolution);
 
@@ -79,6 +83,8 @@ public:
 
     std::shared_ptr<Cuboid> addCuboid(std::array<Coordinate,8> c);
     
+    std::shared_ptr<Channel> addChannel(std::array<int,8> c, unsigned int hollowDir=1);
+
     std::shared_ptr<Channel> addChannel(std::array<Coordinate,8> c, unsigned int hollowDir=1);
 
     std::shared_ptr<TrapezoidalPrism> addTrapezoidalPrism(std::array<Coordinate,8> c);

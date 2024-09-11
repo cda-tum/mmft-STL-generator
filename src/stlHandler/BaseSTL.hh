@@ -59,6 +59,18 @@ Face& BaseSTL::addFace(Face& addFace) {
     return addFace;
 }
 
+std::shared_ptr<Rectangle> BaseSTL::addRectangle(std::array<int,4> c) 
+{
+    std::vector<std::shared_ptr<Vertex>> corners;
+    for (auto p : c) {
+        corners.push_back(vertices[p]);
+    }
+    std::shared_ptr<Rectangle> newRectangle = std::make_shared<Rectangle>(primitives.size(), corners);
+    std::shared_ptr<Primitive> newPrimitive = newRectangle;
+    primitives.push_back(newPrimitive);
+    return newRectangle;
+}
+
 std::shared_ptr<Rectangle> BaseSTL::addRectangle(std::array<Coordinate,4> c) 
 {
     std::vector<std::shared_ptr<Vertex>> corners;
@@ -99,6 +111,29 @@ std::shared_ptr<Trapezoid> BaseSTL::addTrapezoid(std::array<Coordinate,4> c)
     std::shared_ptr<Primitive> newPrimitive = newTrapezoid;
     primitives.push_back(newPrimitive);
     return newTrapezoid;
+}
+
+std::shared_ptr<Pizza> BaseSTL::addPizza(std::array<int,3> c, int radResolution)
+{
+    std::vector<std::shared_ptr<Vertex>> v;
+    for (auto n : {0,1,2}) {
+        v.push_back(vertices[c[n]]);
+    }
+
+    // Add the remaining vertices on the cornicione
+    int i = 0;
+    unsigned int id;
+    while (i < radResolution-1) {
+        id = vertices.size();
+        vertices.push_back(std::make_shared<Vertex>(id));
+        v.push_back(vertices[id]);
+        ++i;
+    }
+    
+    std::shared_ptr<Pizza> newPizza = std::make_shared<Pizza>(primitives.size(), v);
+    std::shared_ptr<Primitive> newPrimitive = newPizza;
+    primitives.push_back(newPrimitive);
+    return newPizza;
 }
 
 std::shared_ptr<Pizza> BaseSTL::addPizza(std::array<Coordinate,3> c, int radResolution)
@@ -212,6 +247,18 @@ std::shared_ptr<Cuboid> BaseSTL::addCuboid(std::array<Coordinate,8> c)
     std::shared_ptr<Primitive> newPrimitive = newCuboid;
     primitives.push_back(newPrimitive);
     return newCuboid;
+}
+
+std::shared_ptr<Channel> BaseSTL::addChannel(std::array<int,8> c, unsigned int hollowDir) 
+{
+    std::vector<std::shared_ptr<Vertex>> corners;
+    for (auto p : c) {
+        corners.push_back(vertices[p]);
+    }
+    std::shared_ptr<Channel> newChannel = std::make_shared<Channel>(primitives.size(), corners, hollowDir);
+    std::shared_ptr<Primitive> newPrimitive = newChannel;
+    primitives.push_back(newPrimitive);
+    return newChannel;
 }
 
 std::shared_ptr<Channel> BaseSTL::addChannel(std::array<Coordinate,8> c, unsigned int hollowDir) 

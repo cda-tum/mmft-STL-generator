@@ -13,9 +13,5 @@ int main(int argc, char const* argv []) {
 
     STL stl = network.toSTL();
 
-    stl.scale(double[]);
-    stl.translate(double[]);
-    st.rotate(double[]);
-
     return 0;
 }
