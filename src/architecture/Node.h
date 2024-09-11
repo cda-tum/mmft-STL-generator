@@ -21,15 +21,17 @@ public:
 
     Node(int id, double x, double y, double z, bool ground=false);
 
-    int getId() const;
+    int getId() const { return id; };
 
     void setGround(bool ground);
 
-    bool getGround() const;
+    bool getGround() const { return ground; };
 
-    void setPosition(double position[3]);
+    void setPosition(double x, double y, double z);
 
-    std::array<double,3> getPosition() const;
+    void setPosition(std::array<double,3> position);
+
+    std::array<double,3> getPosition() const { return position; };
 
 };
 

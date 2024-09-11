@@ -30,21 +30,21 @@ protected:
     ChannelShape shape = ChannelShape::NONE;
 
 public:
-    Channel();
+    Channel(int id, std::shared_ptr<Node> nodeA, std::shared_ptr<Node> nodeB, ChannelShape shape=ChannelShape::NONE);
 
-    int getId() const;
+    int getId() const { return id; };
 
     void setChannelShape(ChannelShape shape);
 
-    ChannelShape getChannelShape() const;
+    ChannelShape getChannelShape() const { return shape;};
 
-    void setNodeA(const std::shared_ptr<Node>& node);
+    void setNodeA(const std::shared_ptr<Node>& nodeA);
 
-    std::shared_ptr<Node> getNodeA() const;
+    std::shared_ptr<Node> getNodeA() const { return nodeA; };
 
-    void setNodeB(const std::shared_ptr<Node>& node);
+    void setNodeB(const std::shared_ptr<Node>& nodeB);
 
-    std::shared_ptr<Node> getNodeB() const;
+    std::shared_ptr<Node> getNodeB() const { return nodeB; };
 
     virtual double getHeight() const {
         throw std::runtime_error("Tried to obtain channel height from non-Rectangular channel");
@@ -63,6 +63,7 @@ private:
     double width;
 
 public:
+    RectangularChannel(int id, std::shared_ptr<Node> nodeA, std::shared_ptr<Node> nodeB);
 
     void setHeight(double height);
 
