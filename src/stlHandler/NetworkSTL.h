@@ -39,7 +39,7 @@ class NetworkSTL : public BaseSTL {
 
 private:
 
-    const int nodeResolution = 100; //< Hardcoded
+    const int nodeResolution = 25; //< Hardcoded
 
     std::shared_ptr<arch::Network> networkPtr;
 

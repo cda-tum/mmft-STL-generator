@@ -46,14 +46,17 @@ NodeSTL NetworkSTL::nodeToSTL(const arch::Node& node)
     // Generate all primitves for the node's "pizza"-sections
     for (auto pizzaPoints : stlNode.pizzaPointIds) {
         // Add the remaining vertices on the cornicione
-        auto topPizza = addPizza(std::array<int,3>({stlNode.topCenterId, pizzaPoints[0], pizzaPoints[1]}), nodeResolution);
-        auto bottomPizza = addPizza(std::array<int,3>({stlNode.bottomCenterId, pizzaPoints[3], pizzaPoints[2]}), nodeResolution);
+        auto topPizza = addPizza(std::array<int,3>({stlNode.topCenterId, stlNode.p2Vertex[pizzaPoints[0]], stlNode.p2Vertex[pizzaPoints[1]]}), nodeResolution);
+        auto bottomPizza = addPizza(std::array<int,3>({stlNode.bottomCenterId, stlNode.p2Vertex[pizzaPoints[3]], stlNode.p2Vertex[pizzaPoints[2]]}), nodeResolution);
+        auto topVertices = topPizza->getVertexIds();
+        auto bottomVertices = bottomPizza->getVertexIds();
+        int n = topVertices.size();
         // Add the rectangle primitives for the node side
-        for (int j=0; j < nodeResolution; j++) {
-            int topStart = vertices.size() -2*nodeResolution +3;
-            int bottomStart = vertices.size() -1;
-            addRectangle({bottomStart-j, bottomStart-j-1, topStart+j+1, topStart+j});
+        addRectangle({bottomVertices[2], bottomVertices[n-1], topVertices[3], topVertices[1]});
+        for (int j=3; j < n-1; j++) {
+            addRectangle({bottomVertices[n-j+2], bottomVertices[n-j+1], topVertices[j+1], topVertices[j]});
         }
+        addRectangle({bottomVertices[3], bottomVertices[1], topVertices[2], topVertices[n-1]});
     }
 
     // Generate all primitives for the node's "triangles"
@@ -254,7 +257,11 @@ void NodeSTL::constructCrown()
             if (channel != channelOrder.begin() && channelOrder.size() > 2) {
                 std::cout << "Doing this" << std::endl;
                 trianglePointIds.push_back({pointId-2, pointId, pointId-1, pointId+1});
-            }
+            } 
+            if (channel+1 == channelOrder.end() && channelOrder.size() > 2) {
+                int pointId = nodePoints.size();
+                trianglePointIds.push_back({pointId-2, 0, pointId-1, 1});
+            }    
             /* The single coordinate is referenced to the current and next channel as:
                 points 0, 4 and 1, 5 if we are currently at node A
                 points 2, 6 and 3, 7 if we are currently at node B */
@@ -266,11 +273,12 @@ void NodeSTL::constructCrown()
         } else {
             std::cout << "Adding pizza coordinates to crown" << std::endl;
             double angle1 = channel->radialAngle + std::atan2(channel->channelPtr->getWidth(), radius);
-            Coordinate p1 = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle1), radius*std::sin(angle1), 0.5*height);
-            Coordinate p1_m = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle1), radius*std::sin(angle1), -0.5*height);
-
             double angle2 = nextChannel->radialAngle - std::atan2(nextChannel->channelPtr->getWidth(), radius);
+            
+            Coordinate p1 = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle1), radius*std::sin(angle1), 0.5*height);
             Coordinate p2 = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle2), radius*std::sin(angle2), 0.5*height);
+
+            Coordinate p1_m = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle1), radius*std::sin(angle1), -0.5*height);    
             Coordinate p2_m = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle2), radius*std::sin(angle2), -0.5*height);
 
             int pointId = nodePoints.size();
@@ -279,6 +287,16 @@ void NodeSTL::constructCrown()
             nodePoints.push_back(p2);
             nodePoints.push_back(p2_m);
             pizzaPointIds.push_back({pointId, pointId+2, pointId+1, pointId+3});
+
+            if (channel != channelOrder.begin()) {
+                std::cout << "Doing this" << std::endl;
+                trianglePointIds.push_back({pointId-2, pointId, pointId-1, pointId+1});
+            } 
+            if (channel+1 == channelOrder.end()) {
+                std::cout << "Doing this2" << std::endl;
+                int pointId = nodePoints.size();
+                trianglePointIds.push_back({pointId-2, 0, pointId-1, 1});
+            }    
 
             /* The single coordinate is referenced to the current and next channel as:
                 points 0, 4 and 1, 5 if we are currently at node A
@@ -289,10 +307,6 @@ void NodeSTL::constructCrown()
             channelPoints.at(nextChannel->channelId)[2] = pointId+2;
 
         }
-    }
-    if (channelOrder.size() > 2) {
-        int pointId = nodePoints.size();
-        trianglePointIds.push_back({pointId-2, 0, pointId-1, 1});
     }
 }
 

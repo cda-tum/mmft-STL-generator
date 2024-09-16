@@ -11,15 +11,20 @@ Pizza::Pizza(unsigned long int id_, std::vector<std::shared_ptr<Vertex>> v_) :
     {
         throw std::domain_error("Tried to define pizza slice with sides of unequal length.");
     }
+    std::cout<< "center: " << center->position.x << ", " << center->position.y << ", " << center->position.z << std::endl;
+    std::cout<< "p1: " << p1->position.x << ", " << p1->position.y << ", " << p1->position.z << std::endl;
     Face temp = Face(0, std::array<std::shared_ptr<Vertex>,3>({center, p1, p2}));
     normal = temp.normal;
-    radResolution = temp.getAngle() / (vertices.size() - 3);
+    radResolution = temp.getAngle() / (vertices.size() - 2);
 
     int i = 1;
-    for (auto vertice = vertices.begin()+3; vertice!=vertices.end(); ++vertice) {
-        (*vertice)->position = p1->position.rotate(center->position, normal, i*radResolution);
+    for (auto vertice = vertices.begin()+3; vertice!=vertices.end(); vertice++) {
+        (*vertice)->position = center->position + p1->position.rotate(center->position, normal, i*radResolution);
+        std::cout<< "v: " << (*vertice)->position.x << ", " << (*vertice)->position.y << ", " << (*vertice)->position.z << std::endl;
         i++;
     }
+
+    std::cout<< "p2: " << p2->position.x << ", " << p2->position.y << ", " << p2->position.z << std::endl;
 }
 
 Pizza::Pizza(unsigned long int id_, std::vector<std::shared_ptr<Vertex>> v_, const Pizza& mirror_, double distance_) :
@@ -49,16 +54,22 @@ Pizza::Pizza(unsigned long int id_, std::vector<std::shared_ptr<Vertex>> v_, con
 void Pizza::render() 
 {
     // Define and add faces
-    for (auto vertice = vertices.begin()+1; vertice!=vertices.end()-1; ++vertice) {
+    std::array<std::shared_ptr<Vertex>,3> v_first = {vertices[0], vertices[1], vertices[3]};
+    Face face1(faces.size(), v_first);
+    this->faces.push_back(face1);
+    for (auto vertice = vertices.begin()+3; vertice!=vertices.end()-1; vertice++) {
         std::array<std::shared_ptr<Vertex>,3> v = {vertices[0], *vertice, *(vertice+1)};
-        Face face(faces.size(), v);
-        this->faces.push_back(face);
+        Face facev(faces.size(), v);
+        this->faces.push_back(facev);
     }
+    std::array<std::shared_ptr<Vertex>,3> v_last = {vertices[0], vertices[vertices.size()-1], vertices[2]};
+    Face face2(faces.size(), v_last);
+    this->faces.push_back(face2);
 }
 
 std::vector<Coordinate> Pizza::getCornicione() {
     std::vector<Coordinate> Cornicione;
-    for (auto vertice = vertices.begin()+1; vertice!=vertices.end(); ++vertice) {
+    for (auto vertice = vertices.begin()+1; vertice!=vertices.end(); vertice++) {
         Cornicione.push_back(Coordinate((*vertice)->position));
     }
     return Cornicione;

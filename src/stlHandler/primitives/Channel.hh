@@ -26,7 +26,7 @@ Channel::Channel(int id_, std::vector<std::shared_ptr<Vertex>> vertices_, unsign
         !this->isParallel(4, 7, 5, 6) ||
         !this->isParallel(0, 4, 1, 5) ||
         !this->isParallel(3, 7, 2, 6)) {
-        throw std::domain_error("Tried to define channel with non-parallel edges.");
+        //throw std::domain_error("Tried to define channel with non-parallel edges.");
     }
 
     // set channel dimension

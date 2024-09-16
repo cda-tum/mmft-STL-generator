@@ -33,6 +33,12 @@ arch::Network networkFromJSON(json jsonString) {
     readNodes(jsonString, network);
     readChannels(jsonString, network);
 
+    for (auto node : network.getNodes()) {
+        if (network.getReach(node->getId()).size() == 1) {
+            node->setGround(true);
+        }
+    }
+
     return network;
 }
 

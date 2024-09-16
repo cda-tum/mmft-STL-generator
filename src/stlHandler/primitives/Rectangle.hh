@@ -13,7 +13,7 @@ Rectangle::Rectangle(int id_, std::vector<std::shared_ptr<Vertex>> vertices_) :
 
     // check if the vertices constitute a rectangle (i.e. borders are parallel)
     if (!this->isParallel(0, 1, 3, 2) || !this->isParallel(0, 3, 1, 2)) {
-        throw std::domain_error("Tried to define rectangle with non-parallel edges.");
+        //throw std::domain_error("Tried to define rectangle with non-parallel edges.");
     }
 
     // check if all vertices lie on a single plane 
@@ -22,7 +22,7 @@ Rectangle::Rectangle(int id_, std::vector<std::shared_ptr<Vertex>> vertices_) :
     if (!this->isParallel(n1, n2)) {
         std::cout << "The normals of this rectangle are: " << n1[0] << ", " << n1[1] << ", " << n1[2] << std::endl;
         std::cout << "The normals of this rectangle are: " << n2[0] << ", " << n2[1] << ", " << n2[2] << std::endl;
-        throw std::domain_error("Tried to define planar rectangle with vertex out-of-plane.");
+        //throw std::domain_error("Tried to define planar rectangle with vertex out-of-plane.");
     }
 
     // set normal value

@@ -7,11 +7,7 @@ void readNodes(json jsonString, arch::Network& network) {
         if (!node.contains("x") || !node.contains("y") || !node.contains("z")) {
             throw std::invalid_argument("Node is ill-defined. Please define:\nx\ny\nz");
         }
-        bool ground = false;
-        if(node.contains("ground")) {
-            ground = node["ground"];
-        }
-        network.addNode(node["x"], node["y"], node["z"], ground);
+        network.addNode(node["x"], node["y"], node["z"]);
     }
 }
 
