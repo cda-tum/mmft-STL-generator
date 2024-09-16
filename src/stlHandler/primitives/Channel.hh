@@ -13,14 +13,14 @@ Channel::Channel(int id_, std::vector<std::shared_ptr<Vertex>> vertices_, unsign
 
     // check if hollow direction is correct.
     if (hollowDir != 0 && hollowDir != 1 && hollowDir != 2) {
-        std::string  errorMessage = "Tried to define channel with invalid hollow direction: " 
+        std::string  errorMessage = "Tried to define channel with invalid hollow direction: "
                                     + std::to_string(hollowDir) 
                                     + ". Valid options are 0, 1, or 2.";
         throw std::invalid_argument(errorMessage);
     }
 
     // check if the vertices constitute a channel (i.e. edges are parallel)
-    if (!this->isParallel(0, 1, 3, 2) || 
+    if (!this->isParallel(0, 1, 3, 2) ||
         !this->isParallel(0, 3, 1, 2) ||
         !this->isParallel(4, 5, 7, 6) ||
         !this->isParallel(4, 7, 5, 6) ||

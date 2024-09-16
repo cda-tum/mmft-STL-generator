@@ -20,12 +20,6 @@
 #include "primitives/TrapezoidalChannel.h"
 #include "primitives/TrapezoidalPrism.h"
 
-namespace arch {
-
-class Network;
-
-}
-
 namespace stl
 {
 
@@ -55,7 +49,7 @@ public:
 
     BaseSTL();
 
-    std::tuple<bool, unsigned int> BaseSTL::findDuplicate(Coordinate c);
+    std::tuple<bool, unsigned int> findDuplicate(Coordinate c);
 
     std::shared_ptr<Vertex> addVertex(std::array<double,3> position);
 

@@ -1,11 +1,11 @@
 set(SOURCE_LIST
-    jsonParser.cpp
     jsonReader.hh
+    jsonParser.hh
 )
 
 set(HEADER_LIST
+    jsonReader.h    
     jsonParser.h
-    jsonReader.h
 )
 
 target_sources(${TARGET_NAME} PUBLIC ${SOURCE_LIST} ${HEADER_LIST})

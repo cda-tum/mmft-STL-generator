@@ -3,7 +3,7 @@
 namespace stl
 {
 
-Pizza::Pizza(int id_, std::vector<std::shared_ptr<Vertex>> v_) :
+Pizza::Pizza(unsigned long int id_, std::vector<std::shared_ptr<Vertex>> v_) :
     Primitive(id_, v_), center(v_[0]), p1(v_[1]), p2(v_[2])
 {
     double radius = (p1->position - center->position).length();
@@ -22,7 +22,7 @@ Pizza::Pizza(int id_, std::vector<std::shared_ptr<Vertex>> v_) :
     }
 }
 
-Pizza::Pizza(int id_, std::vector<std::shared_ptr<Vertex>> v_, const Pizza& mirror_, double distance_) :
+Pizza::Pizza(unsigned long int id_, std::vector<std::shared_ptr<Vertex>> v_, const Pizza& mirror_, double distance_) :
     Primitive(id_, v_), center(v_[0]), p1(v_[1]), p2(v_[2]), radResolution(mirror_.radResolution), radius(mirror_.radius)
 {
     normal = {-mirror_.normal[0], -mirror_.normal[1], -mirror_.normal[2]};

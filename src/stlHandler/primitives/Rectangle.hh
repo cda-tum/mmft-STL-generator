@@ -20,6 +20,8 @@ Rectangle::Rectangle(int id_, std::vector<std::shared_ptr<Vertex>> vertices_) :
     auto n1 = this->getNormal(0, 1, 2);
     auto n2 = this->getNormal(0, 2, 3);
     if (!this->isParallel(n1, n2)) {
+        std::cout << "The normals of this rectangle are: " << n1[0] << ", " << n1[1] << ", " << n1[2] << std::endl;
+        std::cout << "The normals of this rectangle are: " << n2[0] << ", " << n2[1] << ", " << n2[2] << std::endl;
         throw std::domain_error("Tried to define planar rectangle with vertex out-of-plane.");
     }
 

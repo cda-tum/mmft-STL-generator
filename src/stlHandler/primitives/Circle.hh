@@ -3,7 +3,7 @@
 namespace stl
 {
 
-Circle::Circle(int id_, std::vector<std::shared_ptr<Vertex>> v_, std::array<double,3> normal_, double radius_) :
+Circle::Circle(int id_, std::vector<std::shared_ptr<Vertex>> v_, std::array<double,3> normal_) :
     Primitive(id_, v_), center(v_[0]), normal(normal_), p1(v_[1])
 {
     double radius = (p1->position - center->position).length();

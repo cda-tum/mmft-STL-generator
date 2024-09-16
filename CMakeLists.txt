@@ -29,8 +29,8 @@ target_link_libraries(${TARGET_NAME} PUBLIC nlohmann_json::nlohmann_json)
 
 # add sources
 add_subdirectory(src)
+target_sources(${TARGET_NAME} PUBLIC src/main.cpp)
 
 # main executable
 add_executable(MMFTSTL)
-target_sources(MMFTSTL PUBLIC src/main.cpp)
 target_link_libraries(MMFTSTL PUBLIC ${TARGET_NAME})

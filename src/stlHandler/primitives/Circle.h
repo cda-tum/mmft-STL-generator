@@ -33,7 +33,7 @@ private:
 
 public:
 
-    Circle(int id, std::vector<std::shared_ptr<Vertex>> vertices, std::array<double,3> normal, double radius);
+    Circle(int id, std::vector<std::shared_ptr<Vertex>> vertices, std::array<double,3> normal);
 
     void render() override;
 

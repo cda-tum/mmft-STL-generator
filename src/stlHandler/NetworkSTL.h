@@ -11,15 +11,8 @@
 #include <unordered_map>
 
 #include "BaseSTL.h"
-#include "../architecture/Node.h"
-#include "../architecture/Channel.h"
-#include "../architecture/Network.h"
 
 namespace arch {
-
-class Network;
-
-class Node;
 
 struct RadialPosition {
     int channelId;
@@ -40,6 +33,7 @@ struct Cuboid;
 struct Channel;
 struct TrapezoidalPrism;
 struct TrapezoidalChannel;
+class NodeSTL;
 
 class NetworkSTL : public BaseSTL {
 

@@ -8,6 +8,10 @@ bool Primitive::isParallel(std::array<double,3> p1, std::array<double,3> p2) {
     double len1 = sqrt(p1[0]*p1[0] + p1[1]*p1[1] + p1[2]*p1[2]);
     double len2 = sqrt(p2[0]*p2[0] + p2[1]*p2[1] + p2[2]*p2[2]);
 
+    if (len1 <= 1e-12 || len2 <= 1e-12) {
+        throw std::domain_error("Edge or normal with no length defined.");
+    }
+
     double uvec1[3];
     double uvec2[3];
 
@@ -29,7 +33,7 @@ bool Primitive::isParallel(std::array<double,3> p1, std::array<double,3> p2) {
     return false;
 }
 
-bool Primitive::isParallel(unsigned int v1, unsigned int v2, unsigned int v3, unsigned int v4) {
+bool Primitive::isParallel (unsigned long int v1, unsigned long int v2, unsigned long int v3, unsigned long int v4) {
 
     if (vertices.size() <= v1 || 
         vertices.size() <= v2 ||
@@ -43,7 +47,7 @@ bool Primitive::isParallel(unsigned int v1, unsigned int v2, unsigned int v3, un
     return isParallel(p1, p2);
 }
 
-std::array<double,3> Primitive::getNormal(unsigned int v1, unsigned int v2, unsigned int v3) {
+std::array<double,3> Primitive::getNormal(unsigned long int v1, unsigned long int v2, unsigned long int v3) {
     if (vertices.size() <= v1 ||
         vertices.size() <= v2 ||
         vertices.size() <= v3) {

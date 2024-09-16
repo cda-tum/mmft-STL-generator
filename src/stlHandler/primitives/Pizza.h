@@ -36,9 +36,9 @@ public:
      * @brief Defines the coordinates of the 'cornicione' (crust of pizza slice) for the given set of vertices
      * where v[0] is the center, v[1] is p1 and v[2] is p2 which are all three pre-defined.
      */
-    Pizza(int id, std::vector<std::shared_ptr<Vertex>> v);
+    Pizza(long unsigned int id, std::vector<std::shared_ptr<Vertex>> v);
 
-    Pizza(int id, std::vector<std::shared_ptr<Vertex>> v, const Pizza& mirror, double distance);
+    Pizza(long unsigned int id, std::vector<std::shared_ptr<Vertex>> v, const Pizza& mirror, double distance);
 
     void render() override;
 

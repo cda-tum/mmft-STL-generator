@@ -9,10 +9,9 @@
 #include <stdexcept>
 #include <vector>
 
-
-
 namespace stl
 {
+class BaseSTL;
 
 struct Coordinate {
     
@@ -45,9 +44,9 @@ struct Coordinate {
     }
 
     Coordinate crossProduct(const Coordinate& t) const {
-        return Coordinate(  (this->y - t.y) * (this->z - t.z) - (this->z - t.z) * (this->y - t.y),
-                            (this->z - t.z) * (this->x - t.x) - (this->x - t.x) * (this->z - t.z),
-                            (this->x - t.x) * (this->y - t.y) - (this->y - t.y) * (this->x - t.x));
+        return Coordinate(  (this->y * t.z - this->z * t.y),
+                            (this->z * t.x - this->x * t.z),
+                            (this->x * t.y - this->y * t.x));
     }
 
     double dotProduct(const Coordinate& t) const {
@@ -88,6 +87,10 @@ struct Coordinate {
     double length() {
         return sqrt(x*x + y*y + z*z);
     }
+
+    void print() {
+        std::cout << "("<<x<<", "<<y<<", "<<z<<")\n";
+    }
 };
 
 struct Vertex {
@@ -95,11 +98,23 @@ struct Vertex {
     const unsigned int id;
     Coordinate position;
 
+    Vertex(unsigned int id) :
+        id (id) { }
+
     Vertex(unsigned int id, std::array<double,3> position) :
         id(id), position(position) { }
+    
+    Vertex(unsigned int id, Coordinate c) :
+        id(id), position(c) { }
 
     Vertex(unsigned int id, double x, double y, double z) :
         id(id), position(x, y, z) { }
+
+    void print()
+    {
+        std::cout << "Vertex id: " << id << "\t";
+        position.print();
+    }
 
 };
 
@@ -170,23 +185,30 @@ class Primitive {
 
 protected:
 
-    const unsigned int id;
+    const long unsigned int id;
     std::vector<std::shared_ptr<Vertex>> vertices;
     std::vector<Face> faces;
 
-    Primitive(unsigned int id) :
+    Primitive(long unsigned int id) :
         id(id) { }
 
     bool isParallel(std::array<double,3> p1, std::array<double,3> p2);
 
-    bool isParallel(unsigned int v1, unsigned int v2, unsigned int v3, unsigned int v4);
+    bool isParallel(long unsigned int v1, long unsigned int v2, long unsigned int v3, long unsigned int v4);
 
-    std::array<double,3> getNormal(unsigned int v1, unsigned int v2, unsigned int v3);
+    std::array<double,3> getNormal(long unsigned int v1, long unsigned int v2, long unsigned int v3);
 
 public:
 
     Primitive(int id, std::vector<std::shared_ptr<Vertex>> vertices) :
-        id(id), vertices(vertices) { }
+        id(id), vertices(vertices) 
+    {/* TODO: Remove
+        std::cout << "Creating Primitive with following vertices:\n";
+        for (auto& vertex : vertices) {
+            std::cout << "(" << vertex->position.x << ", " << vertex->position.y << ", " << vertex->position.z << ")\n" << std::endl;
+        }
+    */
+    }
 
     int getId() { return id; }
 
@@ -199,6 +221,8 @@ public:
     virtual void render() {
         throw std::logic_error("Tried to execute undefined render function. 'render()' undefined for primitive.");
     };
+
+friend BaseSTL;
     
 };
 

@@ -9,6 +9,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include "Node.h"
+#include "Channel.h"
+
 namespace arch
 {
 
@@ -20,28 +23,32 @@ class Network {
 
 private:
 
-    std::vector<Node> nodes;
-    std::vector<Channel> channels;
+    std::vector<std::shared_ptr<Node>> nodes;
+    std::vector<std::shared_ptr<Channel>> channels;
 
     std::set<int> groundNodeIds;
 
-    std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Channel>> reach;
+    std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Channel>>> reach;
 
 public:
 
     Network();
 
-    std::vector<Node>& getNodes();
+    std::shared_ptr<Node> addNode(double x, double y, double z, bool ground=false);
 
-    Node& getNode(int nodeId);
+    std::shared_ptr<Channel> addChannel(int nodeIdA, int nodeIdB, double width, double height);
 
-    std::vector<Channel>& getChannels();
+    std::vector<std::shared_ptr<Node>>& getNodes() { return nodes; }
 
-    Channel& getChannel(int channelId);
+    std::shared_ptr<Node> getNode(int nodeId) { return nodes[nodeId]; }
 
-    std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Channel>>>& getReach();
+    std::vector<std::shared_ptr<Channel>>& getChannels() { return channels; }
 
-    std::unordered_map<int, std::shared_ptr<Channel>>& getReach(int nodeId);
+    std::shared_ptr<Channel> getChannel(int channelId) { return channels[channelId]; }
+
+    std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Channel>>>& getReach() { return reach; }
+
+    std::unordered_map<int, std::shared_ptr<Channel>>& getReach(int nodeId) { return reach[nodeId]; }
 
 };
 

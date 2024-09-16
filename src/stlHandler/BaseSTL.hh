@@ -1,5 +1,15 @@
 # include "BaseSTL.h"
 
+#include "primitives/Core.hh"
+#include "primitives/Channel.hh"
+#include "primitives/Circle.hh"
+#include "primitives/Cuboid.hh"
+#include "primitives/Pizza.hh"
+#include "primitives/Rectangle.hh"
+#include "primitives/Trapezoid.hh"
+#include "primitives/TrapezoidalChannel.hh"
+#include "primitives/TrapezoidalPrism.hh"
+
 namespace stl {
 
 BaseSTL::BaseSTL() { }
@@ -176,7 +186,7 @@ std::shared_ptr<Pizza> BaseSTL::addPizza(const std::shared_ptr<Pizza>& mirror, d
         ++i;
     }
     
-    std::shared_ptr<Pizza> newPizza = std::make_shared<Pizza>(primitives.size(), v, mirror, d);
+    std::shared_ptr<Pizza> newPizza = std::make_shared<Pizza>(primitives.size(), v, *mirror, d);
     std::shared_ptr<Primitive> newPrimitive = newPizza;
     primitives.push_back(newPrimitive);
     return newPizza;
@@ -221,7 +231,7 @@ std::shared_ptr<Circle> BaseSTL::addCircle(Coordinate c, std::array<double,3> no
         ++i;
     }
 
-    std::shared_ptr<Circle> newCircle = std::make_shared<Circle>(primitives.size(), v);
+    std::shared_ptr<Circle> newCircle = std::make_shared<Circle>(primitives.size(), v, n.toArray());
     std::shared_ptr<Primitive> newPrimitive = newCircle;
     primitives.push_back(newPrimitive);
     return newCircle;
@@ -361,9 +371,9 @@ void BaseSTL::invertFaces() {
 std::array<double,3> BaseSTL::getMin() {
     std::array<double,3> min = {DBL_MAX, DBL_MAX, DBL_MAX};
     for (auto vertex : vertices) {
-        if (vertex->position.x < max[0]) { max[0] = vertex->position.x };
-        if (vertex->position.y < max[1]) { max[1] = vertex->position.y };
-        if (vertex->position.z < max[2]) { max[2] = vertex->position.z };
+        if (vertex->position.x < min[0]) { min[0] = vertex->position.x; }
+        if (vertex->position.y < min[1]) { min[1] = vertex->position.y; }
+        if (vertex->position.z < min[2]) { min[2] = vertex->position.z; }
     }
     return min;
 }
@@ -371,9 +381,9 @@ std::array<double,3> BaseSTL::getMin() {
 std::array<double,3> BaseSTL::getMax() {
     std::array<double,3> max = {-DBL_MAX, -DBL_MAX, -DBL_MAX};
     for (auto vertex : vertices) {
-        if (vertex->position.x > max[0]) { max[0] = vertex->position.x };
-        if (vertex->position.y > max[1]) { max[1] = vertex->position.y };
-        if (vertex->position.z > max[2]) { max[2] = vertex->position.z };
+        if (vertex->position.x > max[0]) { max[0] = vertex->position.x; }
+        if (vertex->position.y > max[1]) { max[1] = vertex->position.y; }
+        if (vertex->position.z > max[2]) { max[2] = vertex->position.z; }
     }
     return max;
 }
@@ -388,6 +398,11 @@ void BaseSTL::writeSTL(std::string stlName) {
     stlFile.open(fileName);
 
     stlFile << "solid " + stlName + "\n";
+    for (auto primitive : primitives) {
+        for (auto face : primitive->getFaces()) {
+            stlFile << face.writeFace();
+        }
+    }
     for (auto face : faces) {
         stlFile << face->writeFace();
     }
