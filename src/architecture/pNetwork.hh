@@ -1,9 +1,9 @@
-#include "Network.h"
+#include "pNetwork.h"
 
-#include "Channel.hh"
-#include "Node.hh"
+#include "pChannel.hh"
+#include "pNode.hh"
 
-namespace arch {
+namespace stl {
 
 Network::Network() { }
 
@@ -38,6 +38,14 @@ std::shared_ptr<Channel> Network::addChannel(int nodeIdA, int nodeIdB, double wi
         reach.at(nodeIdB).try_emplace(channelId, newChannel);
         
         return newChannel;
+    }
+}
+
+void Network::updateGrounds() {
+    for (auto node : nodes) {
+        if (reach.at(node->getId()).size() == 1) {
+            node->setGround(true);
+        }
     }
 }
 

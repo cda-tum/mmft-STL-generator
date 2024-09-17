@@ -3,7 +3,7 @@
 namespace stl
 {
 
-NetworkSTL::NetworkSTL(std::shared_ptr<arch::Network> network) :
+NetworkSTL::NetworkSTL(std::shared_ptr<Network> network) :
     networkPtr(network)
 {
     for (auto node : network->getNodes()) {
@@ -25,10 +25,10 @@ NetworkSTL::NetworkSTL(std::shared_ptr<arch::Network> network) :
 
 }
 
-NodeSTL NetworkSTL::nodeToSTL(const arch::Node& node) 
+NodeSTL NetworkSTL::nodeToSTL(const Node& node) 
 {
     // A node has a set of channels attached to it (reach)
-    std::unordered_map<int, std::shared_ptr<arch::Channel>> reach = networkPtr->getReach(node.getId());
+    std::unordered_map<int, std::shared_ptr<Channel>> reach = networkPtr->getReach(node.getId());
 
     NodeSTL stlNode(node, reach, vertices);
 
@@ -69,14 +69,14 @@ NodeSTL NetworkSTL::nodeToSTL(const arch::Node& node)
     return stlNode;
 }
 
-NodeSTL NetworkSTL::groundNodeToSTL(const arch::Node& node)
+NodeSTL NetworkSTL::groundNodeToSTL(const Node& node)
 {
     // A ground node has only one channel attached to it (reach)
-    std::unordered_map<int, std::shared_ptr<arch::Channel>> reach = networkPtr->getReach(node.getId());
+    std::unordered_map<int, std::shared_ptr<Channel>> reach = networkPtr->getReach(node.getId());
     if (reach.size() > 1) {
         throw std::domain_error("Tried to treat regular node as ground node.");
     }
-    std::shared_ptr<arch::Channel> channel;
+    std::shared_ptr<Channel> channel;
     for (auto& [key, channel_] : reach) {
         channel = channel_;
     }
@@ -97,7 +97,7 @@ NodeSTL NetworkSTL::groundNodeToSTL(const arch::Node& node)
     return stlNode;
 }
 
-Channel NetworkSTL::channelToSTL(const arch::Channel& channel)
+StlChannel NetworkSTL::channelToSTL(const Channel& channel)
 {
     std::array<int, 8> channelVertexIds;
     std::shared_ptr<NodeSTL> stlNodeA = stlNodes.at(channel.getNodeA()->getId());
@@ -123,7 +123,7 @@ Channel NetworkSTL::channelToSTL(const arch::Channel& channel)
  * ======================================== NodeSTL ==============================================
  */
 
-NodeSTL::NodeSTL(const arch::Node& networkNode_, const std::unordered_map<int, std::shared_ptr<arch::Channel>>& reach_, 
+NodeSTL::NodeSTL(const Node& networkNode_, const std::unordered_map<int, std::shared_ptr<Channel>>& reach_, 
     std::vector<std::shared_ptr<Vertex>>& vertices_) :
     id(networkNode_.getId()), networkNode(networkNode_), ground(false)
 {   
@@ -145,15 +145,15 @@ NodeSTL::NodeSTL(const arch::Node& networkNode_, const std::unordered_map<int, s
 
     // Loop through reach and set the radial angles at which the channels are connected to this node.
     for (auto& [key, channel] : reach_) {
-        std::shared_ptr<arch::Node> nodeA = channel->getNodeA();
-        std::shared_ptr<arch::Node> nodeB = channel->getNodeB();
+        std::shared_ptr<Node> nodeA = channel->getNodeA();
+        std::shared_ptr<Node> nodeB = channel->getNodeB();
         double dx = ( id == nodeA->getId() ) ? nodeB->getPosition()[0]-nodeA->getPosition()[0] : nodeA->getPosition()[0]-nodeB->getPosition()[0];
         double dy = ( id == nodeA->getId() ) ? nodeB->getPosition()[1]-nodeA->getPosition()[1] : nodeA->getPosition()[1]-nodeB->getPosition()[1];
         if (std::abs(nodeA->getPosition()[2] - nodeB->getPosition()[2]) > 1e-9) {
             throw std::domain_error("Tried to define planar network with nodes out of plane.");
         }
         double angle = std::fmod(atan2(dy,dx)+2*M_PI,2*M_PI);
-        arch::RadialPosition newPosition ({key, angle, channel});
+        RadialPosition newPosition ({key, angle, channel});
         channelOrder.push_back(newPosition);
     }
 
@@ -163,7 +163,7 @@ NodeSTL::NodeSTL(const arch::Node& networkNode_, const std::unordered_map<int, s
     });
 }
 
-NodeSTL::NodeSTL(const arch::Node& networkGroundNode_, std::shared_ptr<arch::Channel> channel_) :
+NodeSTL::NodeSTL(const Node& networkGroundNode_, std::shared_ptr<Channel> channel_) :
     id(networkGroundNode_.getId()), networkNode(networkGroundNode_), ground(true)
 {   
     // Loop through reach and set this node's height and radius.
@@ -171,15 +171,15 @@ NodeSTL::NodeSTL(const arch::Node& networkGroundNode_, std::shared_ptr<arch::Cha
     radius = channel_->getWidth();
 
     // Set the radil angle at which the channel is connected to this node
-    std::shared_ptr<arch::Node> nodeA = channel_->getNodeA();
-    std::shared_ptr<arch::Node> nodeB = channel_->getNodeB();
+    std::shared_ptr<Node> nodeA = channel_->getNodeA();
+    std::shared_ptr<Node> nodeB = channel_->getNodeB();
     double dx = ( id == nodeA->getId() ) ? nodeB->getPosition()[0]-nodeA->getPosition()[0] : nodeA->getPosition()[0]-nodeB->getPosition()[0];
     double dy = ( id == nodeA->getId() ) ? nodeB->getPosition()[1]-nodeA->getPosition()[1] : nodeA->getPosition()[1]-nodeB->getPosition()[1];
     if (std::abs(nodeA->getPosition()[2] - nodeB->getPosition()[2]) > 1e-9) {
         throw std::domain_error("Tried to define planar network with nodes out of plane.");
     }
     double angle = std::fmod(atan2(dy,dx)+2*M_PI,2*M_PI);
-    arch::RadialPosition channelPosition ({channel_->getId(), angle, channel_});
+    RadialPosition channelPosition ({channel_->getId(), angle, channel_});
 
     double pointX = 0.5*radius*std::sin(channelPosition.radialAngle);
     double pointY = -0.5*radius*std::cos(channelPosition.radialAngle);

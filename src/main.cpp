@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include "architecture/Network.hh"
-#include "parser/jsonParser.hh"
+#include "architecture/pNetwork.hh"
+#include "parser/pjsonParser.hh"
 #include "stlHandler/BaseSTL.hh"
 #include "stlHandler/NetworkSTL.hh"
 
@@ -12,7 +12,7 @@ int main(int argc, char const* argv []) {
 
     // Load and set the network from a JSON file
     std::cout << "[Main] Create network object..." << std::endl;
-    auto network = std::make_shared<arch::Network>(parser::networkFromJSON(file));
+    auto network = std::make_shared<stl::Network>(stl::networkFromJSON(file));
 
     stl::NetworkSTL networkStl(network);
     networkStl.writeSTL(stlFile);

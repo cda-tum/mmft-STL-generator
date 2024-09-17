@@ -1,7 +1,7 @@
 # include "BaseSTL.h"
 
 #include "primitives/Core.hh"
-#include "primitives/Channel.hh"
+#include "primitives/StlChannel.hh"
 #include "primitives/Circle.hh"
 #include "primitives/Cuboid.hh"
 #include "primitives/Pizza.hh"
@@ -13,6 +13,13 @@
 namespace stl {
 
 BaseSTL::BaseSTL() { }
+
+void BaseSTL::printVertices() 
+{
+    for (auto& v : vertices) {
+        v->print();
+    }
+}
 
 std::tuple<bool, unsigned int> BaseSTL::findDuplicate(Coordinate c) 
 {
@@ -259,19 +266,19 @@ std::shared_ptr<Cuboid> BaseSTL::addCuboid(std::array<Coordinate,8> c)
     return newCuboid;
 }
 
-std::shared_ptr<Channel> BaseSTL::addChannel(std::array<int,8> c, unsigned int hollowDir) 
+std::shared_ptr<StlChannel> BaseSTL::addChannel(std::array<int,8> c, unsigned int hollowDir) 
 {
     std::vector<std::shared_ptr<Vertex>> corners;
     for (auto p : c) {
         corners.push_back(vertices[p]);
     }
-    std::shared_ptr<Channel> newChannel = std::make_shared<Channel>(primitives.size(), corners, hollowDir);
+    std::shared_ptr<StlChannel> newChannel = std::make_shared<StlChannel>(primitives.size(), corners, hollowDir);
     std::shared_ptr<Primitive> newPrimitive = newChannel;
     primitives.push_back(newPrimitive);
     return newChannel;
 }
 
-std::shared_ptr<Channel> BaseSTL::addChannel(std::array<Coordinate,8> c, unsigned int hollowDir) 
+std::shared_ptr<StlChannel> BaseSTL::addChannel(std::array<Coordinate,8> c, unsigned int hollowDir) 
 {
     std::vector<std::shared_ptr<Vertex>> corners;
     for (auto p : c) {
@@ -286,7 +293,7 @@ std::shared_ptr<Channel> BaseSTL::addChannel(std::array<Coordinate,8> c, unsigne
             corners.push_back(vertices[id]);
         }
     }
-    std::shared_ptr<Channel> newChannel = std::make_shared<Channel>(primitives.size(), corners, hollowDir);
+    std::shared_ptr<StlChannel> newChannel = std::make_shared<StlChannel>(primitives.size(), corners, hollowDir);
     std::shared_ptr<Primitive> newPrimitive = newChannel;
     primitives.push_back(newPrimitive);
     return newChannel;

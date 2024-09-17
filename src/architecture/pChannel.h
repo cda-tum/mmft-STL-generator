@@ -7,7 +7,7 @@
 #include <memory>
 #include <stdexcept>
 
-namespace arch
+namespace stl
 {
 
 class Node;

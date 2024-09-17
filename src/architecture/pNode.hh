@@ -1,6 +1,6 @@
-#include "Node.h"
+#include "pNode.h"
 
-namespace arch {
+namespace stl {
 
 Node::Node(int id_, double x_, double y_, double z_, bool ground_) :
     id(id_), position({x_, y_, z_}), ground(ground_) { }

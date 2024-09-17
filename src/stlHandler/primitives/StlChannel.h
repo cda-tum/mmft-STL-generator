@@ -24,14 +24,14 @@ namespace stl
  * A channel is hollow and has a set of two traversal faces that are empty
  */
 
-struct Channel : public Primitive {
+struct StlChannel : public Primitive {
 
     std::array<double,3> dimension;
     std::array<double,3> normal1;  // points in local positive x direction (dimension[0])
     std::array<double,3> normal2;  // points in local positive y direction (dimension[1])
     unsigned short hollowDir;  // 0, 1, or 2; i.e., 0 -> hollow in dimension[0]
 
-    Channel(int id, std::vector<std::shared_ptr<Vertex>> vertices, unsigned short hollowDir);
+    StlChannel(int id, std::vector<std::shared_ptr<Vertex>> vertices, unsigned short hollowDir);
 
     void render() override;
 };

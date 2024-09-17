@@ -1,6 +1,6 @@
-#include "Channel.h"
+#include "pChannel.h"
 
-namespace arch {
+namespace stl {
 
 Channel::Channel(int id_, std::shared_ptr<Node> nodeA_, std::shared_ptr<Node> nodeB_, ChannelShape shape_) :
     id(id_), nodeA(nodeA_), nodeB(nodeB_), shape(shape_) { }

@@ -9,10 +9,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Node.h"
-#include "Channel.h"
+#include "pNode.h"
+#include "pChannel.h"
 
-namespace arch
+namespace stl
 {
 
 class Node;
@@ -49,6 +49,8 @@ public:
     std::unordered_map<int, std::unordered_map<int, std::shared_ptr<Channel>>>& getReach() { return reach; }
 
     std::unordered_map<int, std::shared_ptr<Channel>>& getReach(int nodeId) { return reach[nodeId]; }
+
+    void updateGrounds();
 
 };
 

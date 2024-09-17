@@ -1,5 +1,5 @@
 set(SOURCE_LIST
-    Channel.hh
+    StlChannel.hh
     Circle.hh
     Core.hh
     Cuboid.hh
@@ -11,7 +11,7 @@ set(SOURCE_LIST
 )
 
 set(HEADER_LIST
-    Channel.h
+    StlChannel.h
     Circle.h
     Core.h
     Cuboid.h
@@ -22,5 +22,5 @@ set(HEADER_LIST
     TrapezoidalPrism.h
 )
 
-target_sources(${TARGET_NAME} PUBLIC ${SOURCE_LIST} ${HEADER_LIST})
-target_include_directories(${TARGET_NAME} PUBLIC ${CMAKE_CURRENT_LIST_DIR})
+target_sources(${TARGET_NAME} INTERFACE ${SOURCE_LIST} ${HEADER_LIST})
+target_include_directories(${TARGET_NAME} INTERFACE ${CMAKE_CURRENT_LIST_DIR})

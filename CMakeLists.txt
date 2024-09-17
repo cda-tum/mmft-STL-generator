@@ -20,17 +20,36 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/nlohmann/json.git
     GIT_TAG v3.11.2
 )
-FetchContent_MakeAvailable(json)
+FetchContent_Declare(
+    googletest
+    GIT_REPOSITORY https://github.com/google/googletest.git
+    GIT_TAG release-1.11.0
+)
+FetchContent_MakeAvailable(json googletest)
 
 # add library
 set(TARGET_NAME stlLib)
-add_library(${TARGET_NAME})
-target_link_libraries(${TARGET_NAME} PUBLIC nlohmann_json::nlohmann_json)
+add_library(${TARGET_NAME} INTERFACE)
+target_link_libraries(${TARGET_NAME} INTERFACE nlohmann_json::nlohmann_json)
 
 # add sources
 add_subdirectory(src)
-target_sources(${TARGET_NAME} PUBLIC src/main.cpp)
 
 # main executable
 add_executable(MMFTSTL)
 target_link_libraries(MMFTSTL PUBLIC ${TARGET_NAME})
+target_sources(MMFTSTL PUBLIC src/main.cpp)
+
+# create tests
+option(TEST "Configure for building test cases")
+if(TEST)
+    enable_testing()
+    include(GoogleTest)
+    set(TARGET_NAME testLib)
+    add_library(${TARGET_NAME})
+    add_subdirectory(tests)
+    add_executable(STLTest)
+    target_sources(STLTest PUBLIC tests/test.cpp)
+    #target_link_libraries(STLTest PUBLIC gtest gtest_main)
+    target_link_libraries(STLTest PUBLIC gtest ${TARGET_NAME})
+endif()

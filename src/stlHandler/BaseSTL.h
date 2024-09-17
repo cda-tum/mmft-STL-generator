@@ -11,7 +11,7 @@
 #include <vector>
 
 #include "primitives/Core.h"
-#include "primitives/Channel.h"
+#include "primitives/StlChannel.h"
 #include "primitives/Circle.h"
 #include "primitives/Cuboid.h"
 #include "primitives/Pizza.h"
@@ -49,6 +49,21 @@ public:
 
     BaseSTL();
 
+    int getNoVertices() { return vertices.size(); }
+
+    int getNoFaces() 
+    { 
+        int noFaces = 0;
+        for (auto p : primitives) {
+            noFaces += p->getFaces().size();
+        }
+        return faces.size() + noFaces; 
+    }
+
+    int getNoPrimitives() { return primitives.size(); }
+
+    void printVertices();
+
     std::tuple<bool, unsigned int> findDuplicate(Coordinate c);
 
     std::shared_ptr<Vertex> addVertex(std::array<double,3> position);
@@ -77,9 +92,9 @@ public:
 
     std::shared_ptr<Cuboid> addCuboid(std::array<Coordinate,8> c);
     
-    std::shared_ptr<Channel> addChannel(std::array<int,8> c, unsigned int hollowDir=1);
+    std::shared_ptr<StlChannel> addChannel(std::array<int,8> c, unsigned int hollowDir=1);
 
-    std::shared_ptr<Channel> addChannel(std::array<Coordinate,8> c, unsigned int hollowDir=1);
+    std::shared_ptr<StlChannel> addChannel(std::array<Coordinate,8> c, unsigned int hollowDir=1);
 
     std::shared_ptr<TrapezoidalPrism> addTrapezoidalPrism(std::array<Coordinate,8> c);
 

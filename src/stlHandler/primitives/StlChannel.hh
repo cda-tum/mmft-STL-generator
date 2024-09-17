@@ -1,9 +1,9 @@
-#include "Channel.h"
+#include "StlChannel.h"
 
 namespace stl
 {
 
-Channel::Channel(int id_, std::vector<std::shared_ptr<Vertex>> vertices_, unsigned short hollowDir_) :
+StlChannel::StlChannel(int id_, std::vector<std::shared_ptr<Vertex>> vertices_, unsigned short hollowDir_) :
     Primitive(id_, vertices_), hollowDir(hollowDir_)
 {
     // check if no. vertices == 8
@@ -42,7 +42,7 @@ Channel::Channel(int id_, std::vector<std::shared_ptr<Vertex>> vertices_, unsign
     normal2 = dir2.toArray();
 }
 
-void Channel::render() 
+void StlChannel::render() 
 {
     std::array<std::array<int,3>,4> frontBack ={std::array<int,3>{0, 1, 5},
                                                 std::array<int,3>{0, 5, 4},

@@ -12,18 +12,14 @@
 
 #include "BaseSTL.h"
 
-namespace arch {
+namespace stl
+{
 
 struct RadialPosition {
     int channelId;
     double radialAngle;
     std::shared_ptr<Channel> channelPtr;
 };
-
-}
-
-namespace stl
-{
 
 struct Vertex;
 struct Face;
@@ -41,19 +37,19 @@ private:
 
     const int nodeResolution = 25; //< Hardcoded
 
-    std::shared_ptr<arch::Network> networkPtr;
+    std::shared_ptr<Network> networkPtr;
 
     std::unordered_map<int, std::shared_ptr<NodeSTL>> stlNodes;
 
-    NodeSTL nodeToSTL(const arch::Node& node);
+    NodeSTL nodeToSTL(const Node& node);
 
-    NodeSTL groundNodeToSTL(const arch::Node& node);
+    NodeSTL groundNodeToSTL(const Node& node);
 
-    Channel channelToSTL(const arch::Channel& channel);
+    StlChannel channelToSTL(const Channel& channel);
 
 public:
 
-    NetworkSTL(std::shared_ptr<arch::Network> network);
+    NetworkSTL(std::shared_ptr<Network> network);
 
 };
 
@@ -62,13 +58,13 @@ class NodeSTL {
 private:
 
     const int id;
-    const arch::Node networkNode;
+    const Node networkNode;
     const bool ground;
     double height;
     double radius;
     int topCenterId;
     int bottomCenterId;
-    std::vector<arch::RadialPosition> channelOrder;
+    std::vector<RadialPosition> channelOrder;
     std::vector<Coordinate> nodePoints;
     std::map<int, int> p2Vertex;
     /*  For triangle- and pizzaPointIds, the points are stored as
@@ -81,10 +77,10 @@ private:
 
 public:
 
-    NodeSTL(const arch::Node& networkNode, const std::unordered_map<int, std::shared_ptr<arch::Channel>>& reach,
+    NodeSTL(const Node& networkNode, const std::unordered_map<int, std::shared_ptr<Channel>>& reach,
             std::vector<std::shared_ptr<Vertex>>& vertices_);
 
-    NodeSTL(const arch::Node& networkGroundNode, std::shared_ptr<arch::Channel> channel);
+    NodeSTL(const Node& networkGroundNode, std::shared_ptr<Channel> channel);
 
     void constructCrown();
 
