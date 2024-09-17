@@ -14,8 +14,13 @@ int main(int argc, char const* argv []) {
     std::cout << "[Main] Create network object..." << std::endl;
     auto network = std::make_shared<stl::Network>(stl::networkFromJSON(file));
 
+    std::cout << "[Main] Create STL object..." << std::endl;
     stl::NetworkSTL networkStl(network);
+
+    std::cout << "[Main] Write STL..." << std::endl;
     networkStl.writeSTL(stlFile);
+
+    std::cout << "[Main] ...done" << std::endl;
 
     return 0;
 }

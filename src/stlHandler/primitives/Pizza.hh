@@ -11,8 +11,7 @@ Pizza::Pizza(unsigned long int id_, std::vector<std::shared_ptr<Vertex>> v_) :
     {
         throw std::domain_error("Tried to define pizza slice with sides of unequal length.");
     }
-    std::cout<< "center: " << center->position.x << ", " << center->position.y << ", " << center->position.z << std::endl;
-    std::cout<< "p1: " << p1->position.x << ", " << p1->position.y << ", " << p1->position.z << std::endl;
+
     Face temp = Face(0, std::array<std::shared_ptr<Vertex>,3>({center, p1, p2}));
     normal = temp.normal;
     radResolution = temp.getAngle() / (vertices.size() - 2);
@@ -20,11 +19,8 @@ Pizza::Pizza(unsigned long int id_, std::vector<std::shared_ptr<Vertex>> v_) :
     int i = 1;
     for (auto vertice = vertices.begin()+3; vertice!=vertices.end(); vertice++) {
         (*vertice)->position = center->position + p1->position.rotate(center->position, normal, i*radResolution);
-        std::cout<< "v: " << (*vertice)->position.x << ", " << (*vertice)->position.y << ", " << (*vertice)->position.z << std::endl;
         i++;
     }
-
-    std::cout<< "p2: " << p2->position.x << ", " << p2->position.y << ", " << p2->position.z << std::endl;
 }
 
 Pizza::Pizza(unsigned long int id_, std::vector<std::shared_ptr<Vertex>> v_, const Pizza& mirror_, double distance_) :

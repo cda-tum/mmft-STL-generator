@@ -3,8 +3,8 @@
 namespace stl
 {
 
-NetworkSTL::NetworkSTL(std::shared_ptr<Network> network) :
-    networkPtr(network)
+NetworkSTL::NetworkSTL(std::shared_ptr<Network> network, int radialResolution_) :
+    networkPtr(network), radialResolution(radialResolution_)
 {
     for (auto node : network->getNodes()) {
         // If the node is a ground node, it needs a different treatment.
@@ -46,8 +46,8 @@ NodeSTL NetworkSTL::nodeToSTL(const Node& node)
     // Generate all primitves for the node's "pizza"-sections
     for (auto pizzaPoints : stlNode.pizzaPointIds) {
         // Add the remaining vertices on the cornicione
-        auto topPizza = addPizza(std::array<int,3>({stlNode.topCenterId, stlNode.p2Vertex[pizzaPoints[0]], stlNode.p2Vertex[pizzaPoints[1]]}), nodeResolution);
-        auto bottomPizza = addPizza(std::array<int,3>({stlNode.bottomCenterId, stlNode.p2Vertex[pizzaPoints[3]], stlNode.p2Vertex[pizzaPoints[2]]}), nodeResolution);
+        auto topPizza = addPizza(std::array<int,3>({stlNode.topCenterId, stlNode.p2Vertex[pizzaPoints[0]], stlNode.p2Vertex[pizzaPoints[1]]}), radialResolution);
+        auto bottomPizza = addPizza(std::array<int,3>({stlNode.bottomCenterId, stlNode.p2Vertex[pizzaPoints[3]], stlNode.p2Vertex[pizzaPoints[2]]}), radialResolution);
         auto topVertices = topPizza->getVertexIds();
         auto bottomVertices = bottomPizza->getVertexIds();
         int n = topVertices.size();
@@ -61,7 +61,6 @@ NodeSTL NetworkSTL::nodeToSTL(const Node& node)
 
     // Generate all primitives for the node's "triangles"
     for (auto trianglePoints : stlNode.trianglePointIds) {
-        std::cout << "Adding faces" << std::endl;
         addFace(stlNode.topCenterId, stlNode.p2Vertex[trianglePoints[0]], stlNode.p2Vertex[trianglePoints[1]]);
         addFace(stlNode.bottomCenterId, stlNode.p2Vertex[trianglePoints[3]], stlNode.p2Vertex[trianglePoints[2]]);
     }
@@ -139,9 +138,8 @@ NodeSTL::NodeSTL(const Node& networkNode_, const std::unordered_map<int, std::sh
     int vertexId = vertices_.size();
     topCenterId = vertexId;
     bottomCenterId = vertexId+1;
-    vertices_.push_back(std::make_shared<Vertex>((unsigned int) vertices_.size(), Coordinate(networkNode.getPosition()) + Coordinate(0.0, 0.0, 0.5*height)));
-    vertices_.push_back(std::make_shared<Vertex>((unsigned int) vertices_.size()+1, Coordinate(networkNode.getPosition()) + Coordinate(0.0, 0.0, -0.5*height)));
-
+    vertices_.push_back(std::make_shared<Vertex>((unsigned int) topCenterId, Coordinate(networkNode.getPosition()) + Coordinate(0.0, 0.0, 0.5*height)));
+    vertices_.push_back(std::make_shared<Vertex>((unsigned int) bottomCenterId, Coordinate(networkNode.getPosition()) + Coordinate(0.0, 0.0, -0.5*height)));
 
     // Loop through reach and set the radial angles at which the channels are connected to this node.
     for (auto& [key, channel] : reach_) {
@@ -218,11 +216,6 @@ void NodeSTL::constructCrown()
         channelPoints.try_emplace(channel->channelId, std::array<int, 4>());
         channelPoints.try_emplace(nextChannel->channelId, std::array<int, 4>());
 
-        std::cout << "radialAngle = " << channel->radialAngle << std::endl;
-        std::cout << "next radialAngle = " << nextChannel->radialAngle << std::endl;
-        std::cout << "Angle is " << angle << std::endl;
-        std::cout << "radius is " << radius << std::endl;
-
         double pointX = 0.0;
         double pointY = 0.0;
 
@@ -232,22 +225,13 @@ void NodeSTL::constructCrown()
             pointX = std::cos(nextChannel->radialAngle)*alpha + std::cos(channel->radialAngle)*beta;
             pointY = std::sin(nextChannel->radialAngle)*alpha + std::sin(channel->radialAngle)*beta;
         } else if (angle == M_PI) {
-            std::cout << "Getting here" << std::endl;
-            std::cout << "channelWidth " << channel->channelPtr->getWidth() << std::endl;
-            std::cout << "nextChannelWidth " << nextChannel->channelPtr->getWidth() << std::endl;
             if (std::abs(0.5*channel->channelPtr->getWidth() - radius) < 1e-15 && std::abs(0.5*nextChannel->channelPtr->getWidth() - radius) < 1e-15) {
                 pointX = -std::sin(channel->radialAngle)*channel->channelPtr->getWidth()*0.5;
                 pointY = std::cos(channel->radialAngle)*channel->channelPtr->getWidth()*0.5;
             }
         }
-        
-        std::cout << "pointX = " << pointX << std::endl;
-        std::cout << "pointY = " << pointY << std::endl;
-
-        std::cout << "Intersection is at " << sqrt(pointX*pointX + pointY*pointY) << std::endl;
 
         if ( sqrt(pointX*pointX + pointY*pointY) >= radius) {
-            std::cout << "Adding single coordinate to crown" << std::endl;
             /* We add a single coordinate to the sequence*/
             int pointId = nodePoints.size();
             Coordinate newPointTop = Coordinate(pointX, pointY, 0.5*height) + Coordinate(networkNode.getPosition());
@@ -255,7 +239,6 @@ void NodeSTL::constructCrown()
             nodePoints.push_back(newPointTop);
             nodePoints.push_back(newPointBottom);
             if (channel != channelOrder.begin() && channelOrder.size() > 2) {
-                std::cout << "Doing this" << std::endl;
                 trianglePointIds.push_back({pointId-2, pointId, pointId-1, pointId+1});
             } 
             if (channel+1 == channelOrder.end() && channelOrder.size() > 2) {
@@ -271,9 +254,8 @@ void NodeSTL::constructCrown()
             channelPoints.at(nextChannel->channelId)[2] = pointId;
 
         } else {
-            std::cout << "Adding pizza coordinates to crown" << std::endl;
-            double angle1 = channel->radialAngle + std::atan2(channel->channelPtr->getWidth(), radius);
-            double angle2 = nextChannel->radialAngle - std::atan2(nextChannel->channelPtr->getWidth(), radius);
+            double angle1 = channel->radialAngle + 0.5*M_PI;
+            double angle2 = nextChannel->radialAngle - 0.5*M_PI;
             
             Coordinate p1 = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle1), radius*std::sin(angle1), 0.5*height);
             Coordinate p2 = Coordinate(networkNode.getPosition()) + Coordinate(radius*std::cos(angle2), radius*std::sin(angle2), 0.5*height);
@@ -289,11 +271,9 @@ void NodeSTL::constructCrown()
             pizzaPointIds.push_back({pointId, pointId+2, pointId+1, pointId+3});
 
             if (channel != channelOrder.begin()) {
-                std::cout << "Doing this" << std::endl;
                 trianglePointIds.push_back({pointId-2, pointId, pointId-1, pointId+1});
             } 
             if (channel+1 == channelOrder.end()) {
-                std::cout << "Doing this2" << std::endl;
                 int pointId = nodePoints.size();
                 trianglePointIds.push_back({pointId-2, 0, pointId-1, 1});
             }    

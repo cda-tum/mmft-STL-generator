@@ -35,7 +35,7 @@ class NetworkSTL : public BaseSTL {
 
 private:
 
-    const int nodeResolution = 25; //< Hardcoded
+    const int radialResolution;
 
     std::shared_ptr<Network> networkPtr;
 
@@ -49,7 +49,7 @@ private:
 
 public:
 
-    NetworkSTL(std::shared_ptr<Network> network);
+    NetworkSTL(std::shared_ptr<Network> network, int radialResolution=25);
 
 };
 

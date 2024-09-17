@@ -26,6 +26,7 @@ private:
     std::shared_ptr<Vertex> center;
     std::shared_ptr<Vertex> p1;
     std::shared_ptr<Vertex> p2;
+    std::shared_ptr<Vertex> centerOfCurvature;
     double radResolution;  // angle of 1 slice in radial.
     double radius;
     std::array<double,3> normal;

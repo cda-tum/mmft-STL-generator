@@ -202,13 +202,7 @@ public:
 
     Primitive(int id, std::vector<std::shared_ptr<Vertex>> vertices) :
         id(id), vertices(vertices) 
-    {/* TODO: Remove
-        std::cout << "Creating Primitive with following vertices:\n";
-        for (auto& vertex : vertices) {
-            std::cout << "(" << vertex->position.x << ", " << vertex->position.y << ", " << vertex->position.z << ")\n" << std::endl;
-        }
-    */
-    }
+    { }
 
     int getId() { return id; }
 
