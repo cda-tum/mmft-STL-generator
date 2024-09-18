@@ -418,4 +418,16 @@ void BaseSTL::writeSTL(std::string stlName) {
     stlFile.close();
 }
 
+std::string BaseSTL::getSTL (const std::string& name) const {
+	std::stringstream stream;
+	stream << "solid " + name + "\n";
+    for (const auto& primitive: primitives)
+        for (const auto& face: primitive->getFaces())
+            stream << face.writeFace();
+    for (const auto& face: faces)
+        stream << face->writeFace();
+    stream << "endsolid " + name;
+	return stream.str();
+} // std::string BaseSTL::getSTL() const
+
 }   // namespace stl

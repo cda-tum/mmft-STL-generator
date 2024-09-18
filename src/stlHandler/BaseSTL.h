@@ -120,6 +120,8 @@ public:
     std::tuple<std::array<double,3>, std::array<double,3>> getBoundingBox();
 
     void writeSTL(std::string file);
+	
+	std::string getSTL (const std::string& name) const;
 
 };
 
