@@ -157,7 +157,7 @@ struct Face {
         normal[2] = -normal[2];
     }
 
-    std::string writeFace() {
+    std::string writeFace() const {
         std::string faceString;
 
         faceString =    "facet normal " + std::to_string(normal[0]) + " " 
