@@ -428,6 +428,6 @@ std::string BaseSTL::getSTL (const std::string& name) const {
         stream << face->writeFace();
     stream << "endsolid " + name;
 	return stream.str();
-} // std::string BaseSTL::getSTL() const
+}
 
 }   // namespace stl

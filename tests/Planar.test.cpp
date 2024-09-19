@@ -281,3 +281,58 @@ TEST(Planar, ThreeWay2) {
     EXPECT_EQ(networkStl.getNoPrimitives(), 33);
 
 }
+
+TEST(Planar, MultiKink) {
+
+    // define network
+    stl::Network network;
+
+    // nodes
+    auto node1 = network.addNode(0.0015, 0.00575, 0.0);
+    auto node2 = network.addNode(0.002, 0.00575, 0.0);
+    auto node3 = network.addNode(0.00275, 0.00525, 0.0);
+    auto node4 = network.addNode(0.00425, 0.00475, 0.0);
+    auto node5 = network.addNode(0.00625, 0.0045000000000000005, 0.0);
+    auto node6 = network.addNode(0.00675, 0.0045000000000000005, 0.0);
+
+    // channels
+    network.addChannel(node1->getId(), node2->getId(), 1e-4, 5e-5);
+    network.addChannel(node2->getId(), node3->getId(), 1e-4, 5e-5);
+    network.addChannel(node3->getId(), node4->getId(), 1e-4, 5e-5);
+    network.addChannel(node4->getId(), node5->getId(), 1e-4, 5e-5);
+    network.addChannel(node5->getId(), node6->getId(), 1e-4, 5e-5);
+
+    network.updateGrounds();
+
+    stl::NetworkSTL networkStl(std::make_shared<stl::Network>(network), 25);
+
+}
+
+
+TEST(Planar, MultiKink2) {
+
+    // define network
+    stl::Network network;
+
+    // nodes
+    auto node1 = network.addNode(0.002, 0.0035, 0.0);
+    auto node2 = network.addNode(0.002, 0.00525, 0.0);
+    auto node3 = network.addNode(0.006, 0.00525, 0.0);
+    auto node4 = network.addNode(0.00325, 0.00425, 0.0);
+    auto node5 = network.addNode(0.006, 0.0035, 0.0);
+
+    // channels
+    network.addChannel(node1->getId(), node2->getId(), 1e-4, 5e-5);
+    network.addChannel(node2->getId(), node3->getId(), 1e-4, 5e-5);
+    network.addChannel(node3->getId(), node4->getId(), 1e-4, 5e-5);
+    network.addChannel(node4->getId(), node5->getId(), 1e-4, 5e-5);
+
+    network.updateGrounds();
+
+    stl::NetworkSTL networkStl(std::make_shared<stl::Network>(network), 25);
+
+    EXPECT_EQ(networkStl.getNoVertices(), 176);
+    EXPECT_EQ(networkStl.getNoFaces(), 348);
+    EXPECT_EQ(networkStl.getNoPrimitives(), 87);
+
+}

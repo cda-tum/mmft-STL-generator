@@ -158,23 +158,19 @@ struct Face {
     }
 
     std::string writeFace() const {
-        std::string faceString;
+        std::ostringstream faceOss;
+        
+        // Writes stl file in nanometer resolution
+        faceOss << std::setprecision(9) << 
+            "facet normal "<<normal[0]<<" "<<normal[1]<<" "<<normal[2]<<"\n"
+                <<"\touter loop\n"
+                <<"\t\tvertex "<<vertices[0]->position.x<<" "<<vertices[0]->position.y<<" "<<vertices[0]->position.z<<"\n"
+                <<"\t\tvertex "<<vertices[1]->position.x<<" "<<vertices[1]->position.y<<" "<<vertices[1]->position.z<<"\n"
+                <<"\t\tvertex "<<vertices[2]->position.x<<" "<<vertices[2]->position.y<<" "<<vertices[2]->position.z<<"\n"
+                <<"\tendloop\n"
+            <<"endfacet\n";
 
-        faceString =    "facet normal " + std::to_string(normal[0]) + " " 
-                        + std::to_string(normal[1]) + " " 
-                        + std::to_string(normal[2]) + "\n"
-                        + "\touter loop\n"
-                        + "\t\tvertex " + std::to_string(vertices[0]->position.x) + " "
-                        + std::to_string(vertices[0]->position.y) + " "
-                        + std::to_string(vertices[0]->position.z) + "\n"
-                        + "\t\tvertex " + std::to_string(vertices[1]->position.x) + " "
-                        + std::to_string(vertices[1]->position.y) + " "
-                        + std::to_string(vertices[1]->position.z) + "\n"
-                        + "\t\tvertex " + std::to_string(vertices[2]->position.x) + " "
-                        + std::to_string(vertices[2]->position.y) + " "
-                        + std::to_string(vertices[2]->position.z) + "\n"
-                        + "\tendloop\n"
-                        + "endfacet\n";
+        std::string faceString = faceOss.str();
 
         return faceString;
     }

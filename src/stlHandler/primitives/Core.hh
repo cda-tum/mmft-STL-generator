@@ -23,12 +23,12 @@ bool Primitive::isParallel(std::array<double,3> p1, std::array<double,3> p2) {
     uvec2[1] = p2[1]/len2;
     uvec2[2] = p2[2]/len2;
 
-    if (std::abs(uvec1[0]-uvec2[0]) < 1e-12 && std::abs(uvec1[1]-uvec2[1]) < 1e-12 && std::abs(uvec1[2]-uvec2[2]) < 1e-12) {
+    if (std::abs(uvec1[0]-uvec2[0]) < 1e-9 && std::abs(uvec1[1]-uvec2[1]) < 1e-9 && std::abs(uvec1[2]-uvec2[2]) < 1e-9) {
         return true;
     } 
-    if (std::abs(uvec1[0]+uvec2[0]) < 1e-12 && std::abs(uvec1[1]+uvec2[1]) < 1e-12 && std::abs(uvec1[2]+uvec2[2]) < 1e-12) {
+    else if (std::abs(uvec1[0]+uvec2[0]) < 1e-9 && std::abs(uvec1[1]+uvec2[1]) < 1e-9 && std::abs(uvec1[2]+uvec2[2]) < 1e-9) {
         return true;
-    } 
+    }
 
     return false;
 }
