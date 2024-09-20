@@ -282,6 +282,32 @@ TEST(Planar, ThreeWay2) {
 
 }
 
+TEST(Planar, ThreeWay3) {
+
+    // define network
+    stl::Network network;
+
+    // nodes
+    auto node1 = network.addNode(std::cos(0.0), std::sin(0.0), 0.0); // 0 deg
+    auto node2 = network.addNode(std::cos(0.5*M_PI), std::sin(0.5*M_PI), 0.0); // 90 deg
+    auto node3 = network.addNode(std::cos(M_PI), std::sin(M_PI), 0.0); // 180 deg
+    auto node4 = network.addNode(0.0, 0.0, 0.0);
+
+    // channels
+    network.addChannel(node1->getId(), node4->getId(), 0.2, 0.2);
+    network.addChannel(node2->getId(), node4->getId(), 0.2, 0.2);
+    network.addChannel(node3->getId(), node4->getId(), 0.2, 0.2);
+
+    network.updateGrounds();
+
+    stl::NetworkSTL networkStl(std::make_shared<stl::Network>(network), 25);
+
+    EXPECT_EQ(networkStl.getNoVertices(), 20);
+    EXPECT_EQ(networkStl.getNoFaces(), 36);
+    EXPECT_EQ(networkStl.getNoPrimitives(), 6);
+    
+}
+
 TEST(Planar, MultiKink) {
 
     // define network

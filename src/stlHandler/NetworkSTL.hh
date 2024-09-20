@@ -238,10 +238,10 @@ void NodeSTL::constructCrown()
             Coordinate newPointBottom = Coordinate(pointX, pointY, -0.5*height) + Coordinate(networkNode.getPosition());
             nodePoints.push_back(newPointTop);
             nodePoints.push_back(newPointBottom);
-            if (channel != channelOrder.begin() && angle != M_PI) {
+            if (channel != channelOrder.begin() && !(angle == M_PI && channelOrder.size() == 2)) {
                 trianglePointIds.push_back({pointId-2, pointId, pointId-1, pointId+1});
             } 
-            if (channel+1 == channelOrder.end() && angle != M_PI) {
+            if (channel+1 == channelOrder.end() && !(angle == M_PI && channelOrder.size() == 2)) {
                 int pointId = nodePoints.size();
                 trianglePointIds.push_back({pointId-2, 0, pointId-1, 1});
             }    
