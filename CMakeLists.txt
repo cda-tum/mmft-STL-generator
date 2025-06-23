@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21.0)
+cmake_minimum_required(VERSION 3.31.6)
 
 project(MMFT-STL-Generator
     DESCRIPTION "Generator of STL geometries for closed channel-based microfluidic networks."
@@ -18,12 +18,12 @@ include(FetchContent)
 FetchContent_Declare(
     json
     GIT_REPOSITORY https://github.com/nlohmann/json.git
-    GIT_TAG v3.11.2
+    GIT_TAG v3.12.0
 )
 FetchContent_Declare(
     googletest
     GIT_REPOSITORY https://github.com/google/googletest.git
-    GIT_TAG release-1.11.0
+    GIT_TAG v1.17.0
 )
 FetchContent_MakeAvailable(json googletest)
 
