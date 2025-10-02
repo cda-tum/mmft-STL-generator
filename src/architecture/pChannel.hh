@@ -37,4 +37,4 @@ void RectangularChannel::setWidth(double width_)
     width = width_;
 }
 
-}   // namespace arch
+}   // namespace stl

@@ -74,4 +74,4 @@ public:
     double getWidth() const override { return width; }
 };
 
-} // namespace arch
+} // namespace stl

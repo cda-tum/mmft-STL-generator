@@ -20,4 +20,4 @@ void Node::setPosition(std::array<double,3> position_)
     position = position_;
 }
 
-}   // namespace arch
+}   // namespace stl
