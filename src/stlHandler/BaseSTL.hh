@@ -404,29 +404,25 @@ void BaseSTL::writeSTL(std::string stlName) {
     std::string fileName  = stlName + ".stl";
     stlFile.open(fileName);
 
-    stlFile << "solid " + stlName + "\n";
-    for (auto primitive : primitives) {
-        for (auto face : primitive->getFaces()) {
-            stlFile << face.writeFace();
-        }
-    }
-    for (auto face : faces) {
-        stlFile << face->writeFace();
-    }
-    stlFile << "endsolid " + stlName;
+    stlFile << getSTL(stlName);
 
     stlFile.close();
 }
 
 std::string BaseSTL::getSTL (const std::string& name) const {
 	std::stringstream stream;
-	stream << "solid " + name + "\n";
-    for (const auto& primitive: primitives)
-        for (const auto& face: primitive->getFaces())
+
+    stream << "solid " + name + "\n";
+    for (auto primitive : primitives) {
+        for (auto face : primitive->getFaces()) {
             stream << face.writeFace();
-    for (const auto& face: faces)
+        }
+    }
+    for (auto face : faces) {
         stream << face->writeFace();
+    }
     stream << "endsolid " + name;
+
 	return stream.str();
 }
 
