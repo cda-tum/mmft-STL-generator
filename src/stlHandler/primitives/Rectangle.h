@@ -32,6 +32,8 @@ public:
 
     void render() override;
 
+    std::array<double,3> getRectangleNormal() { return normal; }
+
 };
 
 }   // namespace stl

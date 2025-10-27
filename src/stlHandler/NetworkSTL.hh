@@ -91,7 +91,9 @@ NodeSTL NetworkSTL::groundNodeToSTL(const Node& node)
     }
 
     // Generate the rectangular face primitive of the groundNode
-    addRectangle({stlNode.p2Vertex[3], stlNode.p2Vertex[1], stlNode.p2Vertex[0], stlNode.p2Vertex[2]});
+    auto rectangle = addRectangle({stlNode.p2Vertex[3], stlNode.p2Vertex[1], stlNode.p2Vertex[0], stlNode.p2Vertex[2]});
+
+    stlNode.setGroundNormalVector(rectangle->getRectangleNormal());
 
     return stlNode;
 }
@@ -116,6 +118,22 @@ StlChannel NetworkSTL::channelToSTL(const Channel& channel)
     auto newChannel = addChannel(channelVertexIds, 1);
 
     return *newChannel;
+}
+
+std::vector<double> NetworkSTL::getNodeNormalVector(int nodeId) {
+    auto stlNodeIt = stlNodes.find(nodeId);
+    if (stlNodeIt == stlNodes.end()) {
+        throw std::invalid_argument("Tried to get normal vector of non-existing node.");
+    }
+    return stlNodeIt->second->getGroundNormalVector();
+}
+
+double NetworkSTL::getChannelWidthAtNode(int nodeId) {
+    auto stlNodeIt = stlNodes.find(nodeId);
+    if (stlNodeIt == stlNodes.end()) {
+        throw std::invalid_argument("Tried to get channel width at non-existing node.");
+    }
+    return stlNodeIt->second->getGroundChannelWidth();
 }
 
 /**
@@ -288,6 +306,20 @@ void NodeSTL::constructCrown()
 
         }
     }
+}
+
+std::vector<double> NodeSTL::getGroundNormalVector() {
+    if (!ground) {
+        throw std::domain_error("Tried to get ground normal vector of non-ground node.");
+    }
+    return {groundNormalVector[0], groundNormalVector[1]};
+}
+
+double NodeSTL::getGroundChannelWidth() {
+    if (!ground) {
+        throw std::domain_error("Tried to get ground normal vector of non-ground node.");
+    }
+    return channelOrder.at(0).channelPtr->getWidth();
 }
 
 } // namespace stl

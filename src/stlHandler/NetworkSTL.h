@@ -51,6 +51,10 @@ public:
 
     NetworkSTL(std::shared_ptr<Network> network, int radialResolution=25);
 
+    std::vector<double> getNodeNormalVector(int nodeId);
+
+    double getChannelWidthAtNode(int nodeId);
+
 };
 
 class NodeSTL {
@@ -60,6 +64,7 @@ private:
     const int id;
     const Node networkNode;
     const bool ground;
+    std::array<double, 3> groundNormalVector;
     double height;
     double radius;
     int topCenterId;
@@ -83,6 +88,12 @@ public:
     NodeSTL(const Node& networkGroundNode, std::shared_ptr<Channel> channel);
 
     void constructCrown();
+
+    std::vector<double> getGroundNormalVector();
+
+    void setGroundNormalVector(std::array<double,3> normal) { groundNormalVector = normal; }
+
+    double getGroundChannelWidth();
 
 friend class NetworkSTL;
 
