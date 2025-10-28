@@ -319,7 +319,7 @@ double NodeSTL::getGroundChannelWidth() {
     if (!ground) {
         throw std::domain_error("Tried to get ground normal vector of non-ground node.");
     }
-    return channelOrder.at(0).channelPtr->getWidth();
+    return radius;
 }
 
 } // namespace stl
