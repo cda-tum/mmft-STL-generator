@@ -35,9 +35,9 @@ class NetworkSTL : public BaseSTL {
 
 private:
 
-    const int radialResolution;
-
     std::shared_ptr<Network> networkPtr;
+
+    const int radialResolution;
 
     std::unordered_map<int, std::shared_ptr<NodeSTL>> stlNodes;
 

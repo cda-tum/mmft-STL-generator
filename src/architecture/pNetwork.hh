@@ -24,6 +24,25 @@ std::shared_ptr<Node> Network::addNode(double x, double y, double z, bool ground
 std::shared_ptr<Channel> Network::addChannel(int nodeIdA, int nodeIdB, double width, double height) 
 {
     int channelId = channels.size();
+    if (nodeIdA >= int(nodes.size()) || nodeIdB >= int(nodes.size())) 
+    {
+        throw std::invalid_argument("Tried to create channel to undefined node.");
+    }
+    else 
+    {
+        auto newChannel = std::make_shared<RectangularChannel>(channelId, nodes[nodeIdA], nodes[nodeIdB]);
+        newChannel->setWidth(width);
+        newChannel->setHeight(height);
+        channels.push_back(newChannel);
+        reach.at(nodeIdA).try_emplace(channelId, newChannel);
+        reach.at(nodeIdB).try_emplace(channelId, newChannel);
+        
+        return newChannel;
+    }
+}
+
+std::shared_ptr<Channel> Network::addChannel(int channelId, int nodeIdA, int nodeIdB, double width, double height) 
+{
     if (nodeIdA >= nodes.size() || nodeIdB >= nodes.size()) 
     {
         throw std::invalid_argument("Tried to create channel to undefined node.");

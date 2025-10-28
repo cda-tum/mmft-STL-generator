@@ -38,6 +38,8 @@ public:
 
     std::shared_ptr<Channel> addChannel(int nodeIdA, int nodeIdB, double width, double height);
 
+    std::shared_ptr<Channel> addChannel(int channelId, int nodeIdA, int nodeIdB, double width, double height);
+
     std::vector<std::shared_ptr<Node>>& getNodes() { return nodes; }
 
     std::shared_ptr<Node> getNode(int nodeId) { return nodes[nodeId]; }
