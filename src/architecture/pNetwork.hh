@@ -43,7 +43,7 @@ std::shared_ptr<Channel> Network::addChannel(int nodeIdA, int nodeIdB, double wi
 
 std::shared_ptr<Channel> Network::addChannel(int channelId, int nodeIdA, int nodeIdB, double width, double height) 
 {
-    if (nodeIdA >= nodes.size() || nodeIdB >= nodes.size()) 
+    if (nodeIdA >= int(nodes.size()) || nodeIdB >= int(nodes.size())) 
     {
         throw std::invalid_argument("Tried to create channel to undefined node.");
     }
